@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import keyboard
+from string import ascii_lowercase
 
 class App(ctk.CTk):
     def __init__(self) -> None:
@@ -22,8 +23,14 @@ class App(ctk.CTk):
         keyboard.add_hotkey("left", callback=self.on_direction_click_side(-1))
         keyboard.add_hotkey("up", callback=self.on_direction_click_height(-1))
         keyboard.add_hotkey("down", callback=self.on_direction_click_height(1))
+        
+        keyboard.add_hotkey("backspace", callback=self.delete_char)
 
         self.mainloop()
+    
+    def delete_char(self) -> None:
+        self.lines[self.line].delete()
+        self.on_direction_click_side(0)()
     
     def on_direction_click_side(self, val: int):
         def run():
@@ -69,7 +76,7 @@ class Line(ctk.CTkFrame):
         super().__init__(master=master, fg_color="black", corner_radius=0)
 
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
-        self.normal_leter_size = self.normal_font.measure("A") + 0.5
+        self.normal_leter_size = self.normal_font.measure("A")#  + 0.5
         self.small_font = ctk.CTkFont(family="Consolas", size=17)
         self.small_letter_site = self.small_font.measure("B")
 
@@ -149,6 +156,10 @@ class Line(ctk.CTkFrame):
         self.labels.clear()
         
         self.render()
+    
+    def delete(self) -> None:
+        self.letter_list.pop(self.letter_pointer - 1)
+        self.letter_pointer -= 1
 
 class Letter():
     def __init__(self, letter: str, orient: str | None = None) -> None:
