@@ -1,3 +1,4 @@
+from sys import prefix
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
@@ -25,8 +26,49 @@ class App(ctk.CTk):
         keyboard.add_hotkey("down", callback=self.on_direction_click_height(1))
         
         keyboard.add_hotkey("backspace", callback=self.delete_char)
+       
+
+        for i in ascii_lowercase.removeprefix("") + "=-/.":
+            keyboard.add_hotkey(i, callback=self.type_key(i, "n"))
+            keyboard.add_hotkey(f"ctrl+{i}", callback=self.type_key(i, "d"))
+            keyboard.add_hotkey(f"alt+{i}", callback=self.type_key(i, "u"))
+
+        for i in ("n", "d", "u"):
+            if i == "n":
+                prefix = ""
+            elif i == "d":
+                prefix = "ctrl+"
+            else:
+                prefix = "alt+"
+
+            keyboard.add_hotkey(prefix + "space", callback=self.type_key(" ", i))
+            keyboard.add_hotkey(prefix + "shift+1", callback=self.type_key("+", i))
+            keyboard.add_hotkey(prefix + "altgr+-", callback=self.type_key("*", i))
+
+            keyboard.add_hotkey(prefix + "é", callback=self.type_key("0", i))
+            keyboard.add_hotkey(prefix + "1", callback=self.type_key("1", i))
+            keyboard.add_hotkey(prefix + "ě", callback=self.type_key("2", i))
+            keyboard.add_hotkey(prefix + "š", callback=self.type_key("3", i))
+            keyboard.add_hotkey(prefix + "č", callback=self.type_key("4", i))
+            keyboard.add_hotkey(prefix + "ř", callback=self.type_key("5", i))
+            keyboard.add_hotkey(prefix + "ž", callback=self.type_key("6", i))
+            keyboard.add_hotkey(prefix + "ý", callback=self.type_key("7", i))
+            keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i))
+            keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
 
         self.mainloop()
+    
+    def type_key(self, key, type: str):
+        def run():
+            if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
+                self.lines[self.line].delete()
+
+            elif key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "y":
+                self.lines[self.line].delete()
+
+            self.lines[self.line].add_key(key, type)
+            self.on_direction_click_side(0)()
+        return run
     
     def delete_char(self) -> None:
         self.lines[self.line].delete()
@@ -160,6 +202,10 @@ class Line(ctk.CTkFrame):
     def delete(self) -> None:
         self.letter_list.pop(self.letter_pointer - 1)
         self.letter_pointer -= 1
+    
+    def add_key(self, key: str, type: str) -> None:
+        self.letter_list.insert(self.letter_pointer, Letter(key, orient=type))
+        self.letter_pointer += 1
 
 class Letter():
     def __init__(self, letter: str, orient: str | None = None) -> None:
