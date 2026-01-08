@@ -32,6 +32,11 @@ class App(ctk.CTk):
             keyboard.add_hotkey(i, callback=self.type_key(i, "n"))
             keyboard.add_hotkey(f"ctrl+{i}", callback=self.type_key(i, "d"))
             keyboard.add_hotkey(f"alt+{i}", callback=self.type_key(i, "u"))
+        
+        for i in ascii_lowercase.upper():
+            keyboard.add_hotkey(f"shift+{i}", callback=self.type_key(i, "n"))
+            keyboard.add_hotkey(f"ctrl+shift+{i}", callback=self.type_key(i, "d"))
+            keyboard.add_hotkey(f"alt+shift+{i}", callback=self.type_key(i, "u"))
 
         for i in ("n", "d", "u"):
             if i == "n":
@@ -130,7 +135,7 @@ class Line(ctk.CTkFrame):
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
         self.normal_leter_size = self.normal_font.measure("A") + 0.5
         self.small_font = ctk.CTkFont(family="Consolas", size=17)
-        self.small_letter_site = self.small_font.measure("B")
+        self.small_letter_site = self.small_font.measure("B") + 0.5
 
         self.labels: list[ctk.CTkLabel] = []
 
