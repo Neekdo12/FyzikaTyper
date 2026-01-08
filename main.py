@@ -13,9 +13,9 @@ class App(ctk.CTk):
         self.config(bg="black")
 
         self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
-        self.line = 2
+        self.line = 0
 
-        self.lines = [Line(self, text="A * B = C"), Line(self, text="v / t = a"), Line(self, text="s0 + v0 * t + 1/2 * a * t ** 2 = s")]
+        self.lines = [Line(self, text="")]
         for i, v in enumerate(self.lines):
             v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
         
@@ -63,9 +63,32 @@ class App(ctk.CTk):
             keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
         
         keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
+        keyboard.add_hotkey("ctrl+alt+l", callback=self.load)
 
         self.mainloop()
     
+    def rerender(self, height_change: int = 0) -> None:
+        for i, v in enumerate(self.lines):
+            v.place_forget()
+            v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
+        self.on_direction_click_height(height_change)()
+    
+    def load(self) -> None:
+        list(map(lambda line: line.place_forget(), self.lines))
+        self.lines_tuple: list[list[tuple[str, str]]] = []
+        self.line = 0
+
+        with open("save.json", "r") as file:
+            self.lines_tuple = json.load(file)["lines"]
+        
+        self.lines = []
+        
+        for i in self.lines_tuple:
+            self.lines.append(Line(self, i))
+        
+        self.cursor.lift()
+        self.rerender()
+
     def save(self) -> None:
         self.lines_tuple = []
         for i in self.lines:
@@ -78,9 +101,7 @@ class App(ctk.CTk):
         self.lines.insert(self.line + 1, Line(self, ""))
         self.cursor.lift()
 
-        for i, v in enumerate(self.lines):
-            v.place_forget()
-            v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
+        self.rerender(height_change=1)
         
         self.on_direction_click_height(1)()
     
@@ -140,7 +161,7 @@ class App(ctk.CTk):
         return run
     
 class Line(ctk.CTkFrame):
-    def __init__(self, master, text = "Noneni"):
+    def __init__(self, master, text: str | list[tuple[str, str]] = "Noneni"):
         super().__init__(master=master, fg_color="black", corner_radius=0)
 
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
@@ -150,9 +171,13 @@ class Line(ctk.CTkFrame):
 
         self.labels: list[ctk.CTkLabel] = []
 
-        self.letter_list: list[Letter] = [Letter(i) for i in text]
+        if isinstance(text, str):
+            self.letter_list: list[Letter] = [Letter(i) for i in text]
+        else:
+            self.letter_list: list[Letter] = [Letter(i[0], orient=i[1]) for i in text]
+
         self.letter_tuple = []
-        self.letter_pointer: int = 10
+        self.letter_pointer: int = 0
 
         self.render()
         # self.test_text()
