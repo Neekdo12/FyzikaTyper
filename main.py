@@ -2,6 +2,7 @@ from sys import prefix
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
+import json
 
 class App(ctk.CTk):
     def __init__(self) -> None:
@@ -60,8 +61,18 @@ class App(ctk.CTk):
             keyboard.add_hotkey(prefix + "ý", callback=self.type_key("7", i))
             keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i))
             keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
+        
+        keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
 
         self.mainloop()
+    
+    def save(self) -> None:
+        self.lines_tuple = []
+        for i in self.lines:
+            self.lines_tuple.append(i.letter_tuple)
+        
+        with open("save.json", "w") as file:
+            json.dump({"lines": self.lines_tuple}, file, indent=4)
     
     def new_line(self) -> None:
         self.lines.insert(self.line + 1, Line(self, ""))
