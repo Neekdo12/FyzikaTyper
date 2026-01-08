@@ -41,7 +41,7 @@ class App(ctk.CTk):
 
         for i in ("n", "d", "u"):
             if i == "n":
-                prefix = ""
+                prefix: str = ""
             elif i == "d":
                 prefix = "ctrl+"
             else:
@@ -98,12 +98,11 @@ class App(ctk.CTk):
             json.dump({"lines": self.lines_tuple}, file, indent=4)
     
     def new_line(self) -> None:
+        self.lines[self.line].letter_pointer = 0
         self.lines.insert(self.line + 1, Line(self, ""))
         self.cursor.lift()
 
         self.rerender(height_change=1)
-        
-        self.on_direction_click_height(1)()
     
     def type_key(self, key, type: str):
         def run():
@@ -147,11 +146,15 @@ class App(ctk.CTk):
         def run():
             if self.line + 1 >= len(self.lines) and val > 0:
                 self.line = 0
+
             elif self.line - 1 == -1 and val < 0:
                 self.line = len(self.lines) - 1
                 self.lines[self.line].letter_pointer = self.lines[0].letter_pointer
+
                 self.on_direction_click_side(0)()
+
                 return None
+            
             else:
                 self.line += val
 
@@ -165,9 +168,9 @@ class Line(ctk.CTkFrame):
         super().__init__(master=master, fg_color="black", corner_radius=0)
 
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
-        self.normal_leter_size = self.normal_font.measure("A") + 0.5
+        self.normal_leter_size = self.normal_font.measure("A")
         self.small_font = ctk.CTkFont(family="Consolas", size=17)
-        self.small_letter_site = self.small_font.measure("B") + 0.5
+        self.small_letter_site = self.small_font.measure("B")
 
         self.labels: list[ctk.CTkLabel] = []
 
