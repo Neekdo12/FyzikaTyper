@@ -26,7 +26,7 @@ class App(ctk.CTk):
         keyboard.add_hotkey("down", callback=self.on_direction_click_height(1))
         
         keyboard.add_hotkey("backspace", callback=self.delete_char)
-       
+        keyboard.add_hotkey("enter", callback=self.new_line)
 
         for i in ascii_lowercase.removeprefix("") + "=-/.":
             keyboard.add_hotkey(i, callback=self.type_key(i, "n"))
@@ -57,6 +57,16 @@ class App(ctk.CTk):
             keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
 
         self.mainloop()
+    
+    def new_line(self) -> None:
+        self.lines.insert(self.line + 1, Line(self, ""))
+        self.cursor.lift()
+
+        for i, v in enumerate(self.lines):
+            v.place_forget()
+            v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
+        
+        self.on_direction_click_height(1)()
     
     def type_key(self, key, type: str):
         def run():
@@ -118,21 +128,13 @@ class Line(ctk.CTkFrame):
         super().__init__(master=master, fg_color="black", corner_radius=0)
 
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
-        self.normal_leter_size = self.normal_font.measure("A")#  + 0.5
+        self.normal_leter_size = self.normal_font.measure("A") + 0.5
         self.small_font = ctk.CTkFont(family="Consolas", size=17)
         self.small_letter_site = self.small_font.measure("B")
 
         self.labels: list[ctk.CTkLabel] = []
 
         self.letter_list: list[Letter] = [Letter(i) for i in text]
-        self.letter_list.append(Letter("g", orient="d"))
-        self.letter_list.append(Letter("g"))
-        self.letter_list.append(Letter("2", orient="u"))
-        self.letter_list.append(Letter(" "))
-        self.letter_list.append(Letter("t"))
-        self.letter_list.append(Letter("A", orient="d"))
-        self.letter_list.append(Letter("2", orient="d"))
-        self.letter_list.append(Letter("2", orient="u"))
         self.letter_tuple = []
         self.letter_pointer: int = 10
 
@@ -149,6 +151,10 @@ class Line(ctk.CTkFrame):
 
         for i in self.letter_list:
             self.letter_tuple.append(i.get_tuple())
+
+        if len(self.letter_tuple) == 0:
+            self.dict_counter = 0
+            return None
         
         for num, i in enumerate(self.letter_tuple):
             if num == self.letter_pointer:
