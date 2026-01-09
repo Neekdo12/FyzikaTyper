@@ -4,6 +4,8 @@ import keyboard
 from string import ascii_lowercase
 import json
 
+from line import Line
+
 class App(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
@@ -11,6 +13,63 @@ class App(ctk.CTk):
         self.geometry("700x300")
         self.title("Typer")
         self.config(bg="black")
+
+        self.windows_bar_frame = WindowSwitcher(self)
+
+        for i, v in enumerate(ascii_lowercase):
+
+            window1 = Window(self, name=v)
+            window1_link = WindowLink(self.windows_bar_frame, window1)
+            window1_link.bind("<Button-1>", self.windows_bar_frame.set_window(i))
+            window1_link.label.bind("<Button-1>", self.windows_bar_frame.set_window(i))
+
+            self.windows_bar_frame.add_window(window1_link)
+
+        self.mainloop()
+
+class WindowSwitcher(ctk.CTkScrollableFrame):
+    def __init__(self, master) -> None:
+        super().__init__(master=master, orientation="horizontal")
+        self._scrollbar.configure(height = 5)
+
+        self.active_window = 0
+        self.windows = []
+
+        self.place(x = 0, y = 0, relwidth = 1, relheight = 0.1)
+    
+    def add_window(self, window_link: WindowLink, main = False) -> None:
+        self.windows.append(window_link)
+        window_link.pack(side = "left", fill = "y", expand = True, padx = 3, pady = 1)
+
+        if main:
+            self.active_window = len(self.windows) - 1
+            window_link.render()
+
+    def set_window(self, window):
+        def run(event): 
+            self.windows[self.active_window].clear()
+            self.active_window = window
+            self.windows[self.active_window].render()
+        
+        return run
+
+
+class WindowLink(ctk.CTkFrame):
+    def __init__(self, master, window: Window) -> None:
+        super().__init__(master=master, fg_color="#FF0000", width=100, height=500)
+        self.window: Window = window
+        self.label = ctk.CTkLabel(self, text="Widnow 1")
+        self.label.pack()
+    
+    def render(self) -> None:
+        self.window.place(x = 0, rely = 0.1, relwidth = 1, relheight = 0.9)
+    
+    def clear(self) -> None:
+        self.window.place_forget()
+
+class Window(ctk.CTkFrame):
+    def __init__(self, master, name: str = "") -> None:
+        super().__init__(master=master)
 
         self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
         self.line = 0
@@ -65,7 +124,7 @@ class App(ctk.CTk):
         keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
         keyboard.add_hotkey("ctrl+alt+l", callback=self.load)
 
-        self.mainloop()
+        self.type_key(name, "n")()
     
     def rerender(self, height_change: int = 0) -> None:
         for i, v in enumerate(self.lines):
@@ -167,125 +226,6 @@ class App(ctk.CTk):
             self.on_direction_click_side(0)()
         
         return run
-    
-class Line(ctk.CTkFrame):
-    def __init__(self, master, text: str | list[tuple[str, str]] = "Noneni"):
-        super().__init__(master=master, fg_color="black", corner_radius=0)
-
-        self.normal_font = ctk.CTkFont(family="Consolas", size=30)
-        self.normal_leter_size = self.normal_font.measure("A") + 0.5
-        self.small_font = ctk.CTkFont(family="Consolas", size=17)
-        self.small_letter_site = self.small_font.measure("B") + 0.5
-
-        self.labels: list[ctk.CTkLabel] = []
-
-        if isinstance(text, str):
-            self.letter_list: list[Letter] = [Letter(i) for i in text]
-        else:
-            self.letter_list: list[Letter] = [Letter(i[0], orient=i[1]) for i in text]
-
-        self.letter_tuple = []
-        self.letter_pointer: int = 0
-
-        self.render()
-        # self.test_text()
-
-    def render(self) -> None:
-        self.render_dict: dict[str, str] = {}
-        self.dict_pointer = -1
-        self.dict_helper: str = ""
-        self.count = True
-        self.dict_counter = 0
-        self.letter_tuple = []
-
-        for i in self.letter_list:
-            self.letter_tuple.append(i.get_tuple())
-
-        if len(self.letter_tuple) == 0:
-            self.dict_counter = 0
-            return None
-        
-        for num, i in enumerate(self.letter_tuple):
-            if num == self.letter_pointer:
-                self.count = False
-
-            if i[1] == "n":
-                self.dict_counter += self.normal_leter_size if self.count else 0
-                if self.dict_helper == "n":
-                    self.render_dict[f"{self.dict_pointer}n"] += i[0]
-                else:
-                    self.dict_pointer += 1
-                    self.dict_helper = "n"
-                    self.render_dict[f"{self.dict_pointer}n"] = i[0]
-            
-            if i[1] == "d":
-                self.dict_counter += self.small_letter_site if self.count else 0
-                if self.dict_helper == "d":
-                    self.render_dict[f"{self.dict_pointer}d"] += i[0]
-                else:
-                    self.dict_helper = "d"
-                    self.render_dict[f"{self.dict_pointer}d"] = i[0]
-            
-            if i[1] == "u":
-                self.dict_counter += self.small_letter_site if self.count else 0
-                if self.dict_helper == "u":
-                    self.render_dict[f"{self.dict_pointer}u"] += i[0]
-                else:
-                    self.dict_helper = "u"
-                    self.render_dict[f"{self.dict_pointer}u"] = i[0]
-        
-        self.dict_pointer = 0
-        self.dict_helper: str = list(self.render_dict.keys())[0][1]
-        for i in self.render_dict:
-            if i[1] == "n":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.normal_font))
-                self.labels[-1].pack(side = "left")
-            elif i[1] == "d":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.small_font, anchor="sw"))
-                self.labels[-1].pack(side = "left")
-            elif i[1] == "u":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.small_font, anchor="nw"))
-                self.labels[-1].pack(side = "left")
-    
-    def rerender(self) -> None:
-        for i in self.labels:
-            i.pack_forget()
-        self.labels.clear()
-        
-        self.render()
-    
-    def recount(self) -> None:
-        self.dict_counter = 0
-        self.count = True
-
-        for num, i in enumerate(self.letter_tuple):
-            if num == self.letter_pointer:
-                self.count = False
-
-            if i[1] == "n":
-                self.dict_counter += self.normal_leter_size if self.count else 0
-            
-            elif i[1] == "d":
-                self.dict_counter += self.small_letter_site if self.count else 0
-            
-            elif i[1] == "u":
-                self.dict_counter += self.small_letter_site if self.count else 0
-    
-    def delete(self) -> None:
-        self.letter_list.pop(self.letter_pointer - 1)
-        self.letter_pointer -= 1
-    
-    def add_key(self, key: str, type: str) -> None:
-        self.letter_list.insert(self.letter_pointer, Letter(key, orient=type))
-        self.letter_pointer += 1
-
-class Letter():
-    def __init__(self, letter: str, orient: str | None = None) -> None:
-        self.letter = letter
-        self.orient = orient if orient is not None else "n"
-    
-    def get_tuple(self):
-        return (self.letter, self.orient)
 
 if __name__ == "__main__":
     App()
