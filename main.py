@@ -122,6 +122,7 @@ class App(ctk.CTk):
     
     def delete_char(self) -> None:
         self.lines[self.line].delete()
+        self.rerender_line(self.line)
         self.on_direction_click_side(0)()
     
     def on_direction_click_side(self, val: int):
