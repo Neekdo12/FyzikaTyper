@@ -104,6 +104,9 @@ class App(ctk.CTk):
 
         self.rerender(height_change=1)
     
+    def rerender_line(self, line: int) -> None:
+        self.lines[line].rerender()
+    
     def type_key(self, key, type: str):
         def run():
             if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
@@ -114,6 +117,7 @@ class App(ctk.CTk):
 
             self.lines[self.line].add_key(key, type)
             self.on_direction_click_side(0)()
+            self.rerender_line(self.line)
         return run
     
     def delete_char(self) -> None:
@@ -134,9 +138,9 @@ class App(ctk.CTk):
                 self.on_direction_click_height(-1)()
                 return None
 
-            self.lines[self.line].place_forget()
-            self.lines[self.line].place(x = 0, rely = 0.1 * self.line, relwidth = 1, relheight = 0.1)
-            self.lines[self.line].rerender()
+            # self.lines[self.line].place_forget()
+            # self.lines[self.line].place(x = 0, rely = 0.1 * self.line, relwidth = 1, relheight = 0.1)
+            self.lines[self.line].recount()
             self.cursor.place_forget()
             self.cursor.place(x = self.lines[self.line].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
 
@@ -248,6 +252,23 @@ class Line(ctk.CTkFrame):
         self.labels.clear()
         
         self.render()
+    
+    def recount(self) -> None:
+        self.dict_counter = 0
+        self.count = True
+
+        for num, i in enumerate(self.letter_tuple):
+            if num == self.letter_pointer:
+                self.count = False
+
+            if i[1] == "n":
+                self.dict_counter += self.normal_leter_size if self.count else 0
+            
+            elif i[1] == "d":
+                self.dict_counter += self.small_letter_site if self.count else 0
+            
+            elif i[1] == "u":
+                self.dict_counter += self.small_letter_site if self.count else 0
     
     def delete(self) -> None:
         self.letter_list.pop(self.letter_pointer - 1)
