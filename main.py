@@ -116,8 +116,8 @@ class App(ctk.CTk):
                 self.lines[self.line].delete()
 
             self.lines[self.line].add_key(key, type)
-            self.on_direction_click_side(0)()
             self.rerender_line(self.line)
+            self.on_direction_click_side(0)()
         return run
     
     def delete_char(self) -> None:
@@ -172,9 +172,9 @@ class Line(ctk.CTkFrame):
         super().__init__(master=master, fg_color="black", corner_radius=0)
 
         self.normal_font = ctk.CTkFont(family="Consolas", size=30)
-        self.normal_leter_size = self.normal_font.measure("A")
+        self.normal_leter_size = self.normal_font.measure("A") + 0.5
         self.small_font = ctk.CTkFont(family="Consolas", size=17)
-        self.small_letter_site = self.small_font.measure("B")
+        self.small_letter_site = self.small_font.measure("B") + 0.5
 
         self.labels: list[ctk.CTkLabel] = []
 
