@@ -45,13 +45,12 @@ class Window(ctk.CTkFrame):
         self.cursor.lift()
         self.rerender()
 
-    def save(self) -> None:
+    def save(self) -> list[list[tuple[str, str]]]:
         self.lines_tuple = []
         for i in self.lines:
             self.lines_tuple.append(i.letter_tuple)
         
-        with open("save.json", "w") as file:
-            json.dump({"lines": self.lines_tuple}, file, indent=4)
+        return self.lines_tuple
     
     def new_line(self) -> None:
         self.lines[self.line].letter_pointer = 0

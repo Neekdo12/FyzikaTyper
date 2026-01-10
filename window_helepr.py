@@ -38,6 +38,7 @@ class WindowLink(ctk.CTkFrame):
     def __init__(self, master, window: Window, title: str = "Undefined title") -> None:
         super().__init__(master=master, fg_color="#FF0000")
         self.window: Window = window
+        self.title = title
 
         self.label = ctk.CTkLabel(self, text=title)
         self.label.pack()

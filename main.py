@@ -19,7 +19,8 @@ class App(ctk.CTk):
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
 
         # self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self), title="My first window"))
-        self.create_window("My first window", None)
+        # self.create_window("My first window", None)
+        self.load()
 
         self.create_hotkeys()
 
@@ -70,8 +71,8 @@ class App(ctk.CTk):
             self.hotkeys.append(keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i)))
             self.hotkeys.append(keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i)))
         
-        # self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
-        # self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
     
     def clear_hotkeys(self) -> None:
@@ -113,6 +114,23 @@ class App(ctk.CTk):
     def create_window(self, title, content):
         # test_line = [[("N", "n"), ("e", "d")], [("a", "n"), ("2", "u")]] # test for some small text sample
         self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self, content=content), title=title if title != "" else "Not defined"))
+    
+    def save(self):
+        self.save_data = {}
+
+        for i in self.windows_bar_frame.windows:
+            self.save_data[i.title] = i.window.save()
+        
+        with open("save.json", "w") as file:
+            json.dump(self.save_data, file)
+    
+    def load(self):
+        with open("save.json", "r") as file:
+            self.save_data = json.load(file)
+        
+        for i in self.save_data:
+            self.create_window(i, self.save_data[i])
+
 
 if __name__ == "__main__":
     App()
