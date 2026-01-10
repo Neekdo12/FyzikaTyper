@@ -3,6 +3,7 @@ import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
 import json
+from pynput import keyboard
 
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
@@ -27,56 +28,58 @@ class App(ctk.CTk):
         self.mainloop()
     
     def create_hotkeys(self) -> None:
-        self.hotkeys: list[Callable] = []
+        self.hotkeys: dict[str, Callable] = {}
 
-        self.hotkeys.append(keyboard.add_hotkey("right", callback=self.on_direction_click_side(1)))
-        self.hotkeys.append(keyboard.add_hotkey("left", callback=self.on_direction_click_side(-1)))
-        self.hotkeys.append(keyboard.add_hotkey("up", callback=self.on_direction_click_height(-1)))
-        self.hotkeys.append(keyboard.add_hotkey("down", callback=self.on_direction_click_height(1)))
+        self.hotkeys["<right>"] = self.on_direction_click_side(1)
+        self.hotkeys["<left>"] = self.on_direction_click_side(-1)
+        self.hotkeys["<up>"] = self.on_direction_click_height(-1)
+        self.hotkeys["<down>"] = self.on_direction_click_height(1)
         
-        self.hotkeys.append(keyboard.add_hotkey("backspace", callback=self.delete_char))
-        self.hotkeys.append(keyboard.add_hotkey("enter", callback=self.new_line))
+        self.hotkeys["<backspace>"] = self.delete_char
+        self.hotkeys["<enter>"] = self.new_line
 
         for i in ascii_lowercase.removeprefix("") + "=-/.":
-            self.hotkeys.append(keyboard.add_hotkey(i, callback=self.type_key(i, "n")))
-            self.hotkeys.append(keyboard.add_hotkey(f"ctrl+{i}", callback=self.type_key(i, "d")))
-            self.hotkeys.append(keyboard.add_hotkey(f"alt+{i}", callback=self.type_key(i, "u")))
+            self.hotkeys[i] = self.type_key(i, "n")
+            self.hotkeys[f"<ctrl>+{i}"] = self.type_key(i, "d")
+            self.hotkeys[f"<alt>+{i}"] = self.type_key(i, "u")
         
         for i in ascii_lowercase.upper():
-            self.hotkeys.append(keyboard.add_hotkey(f"shift+{i}", callback=self.type_key(i, "n")))
-            self.hotkeys.append(keyboard.add_hotkey(f"ctrl+shift+{i}", callback=self.type_key(i, "d")))
-            self.hotkeys.append(keyboard.add_hotkey(f"alt+shift+{i}", callback=self.type_key(i, "u")))
+            self.hotkeys[f"<shift>+{i}"] = self.type_key(i, "n")
+            self.hotkeys[f"<ctrl>+<shift>+{i}"] = self.type_key(i, "d")
+            self.hotkeys[f"<alt>+<shift>+{i}"] = self.type_key(i, "u")
 
         for i in ("n", "d", "u"):
             if i == "n":
                 prefix: str = ""
             elif i == "d":
-                prefix = "ctrl+"
+                prefix = "<ctrl>+"
             else:
-                prefix = "alt+"
+                prefix = "<alt>+"
 
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "space", callback=self.type_key(" ", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "shift+1", callback=self.type_key("+", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "altgr+-", callback=self.type_key("*", i)))
+            self.hotkeys[prefix + "<space>"] = self.type_key(" ", i)
+            self.hotkeys[prefix + "<shift>+1"] = self.type_key("+", i)
+            self.hotkeys[prefix + "<alt_gr>+-"] = self.type_key("*", i)
 
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "é", callback=self.type_key("0", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "1", callback=self.type_key("1", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "ě", callback=self.type_key("2", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "š", callback=self.type_key("3", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "č", callback=self.type_key("4", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "ř", callback=self.type_key("5", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "ž", callback=self.type_key("6", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "ý", callback=self.type_key("7", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i)))
-            self.hotkeys.append(keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i)))
+            self.hotkeys[prefix + "é"] = self.type_key("0", i)
+            self.hotkeys[prefix + "1"] = self.type_key("1", i)
+            self.hotkeys[prefix + "ě"] = self.type_key("2", i)
+            self.hotkeys[prefix + "š"] = self.type_key("3", i)
+            self.hotkeys[prefix + "č"] = self.type_key("4", i)
+            self.hotkeys[prefix + "ř"] = self.type_key("5", i)
+            self.hotkeys[prefix + "ž"] = self.type_key("6", i)
+            self.hotkeys[prefix + "ý"] = self.type_key("7", i)
+            self.hotkeys[prefix + "á"] = self.type_key("8", i)
+            self.hotkeys[prefix + "í"] = self.type_key("9", i)
         
-        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
-        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
-        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
+        self.hotkeys["<ctrl>+<alt>+s"] = self.save
+        self.hotkeys["<ctrl>+<alt>+l"] = self.load
+        self.hotkeys["<ctrl>+<alt>+n"] = self.new_window
+
+        self.hotkeys_runner = keyboard.GlobalHotKeys(self.hotkeys)
+        self.hotkeys_runner.start()
     
     def clear_hotkeys(self) -> None:
-        for i in self.hotkeys:
-            keyboard.remove_hotkey(i)
+        self.hotkeys_runner.stop()
     
     def new_window(self) -> None:
         self.clear_hotkeys()
