@@ -1,3 +1,5 @@
+from asyncio.base_tasks import _task_print_stack
+from typing import Callable
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
@@ -15,32 +17,33 @@ class App(ctk.CTk):
 
         self.windows_bar_frame = WindowSwitcher(self)
 
-        for i, v in enumerate(ascii_lowercase):
+        self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self), title="My first window"))
 
-            window1 = Window(self, name=v)
-            window1_link = WindowLink(self.windows_bar_frame, window1)
-            window1_link.bind("<Button-1>", self.windows_bar_frame.set_window(i))
-            window1_link.label.bind("<Button-1>", self.windows_bar_frame.set_window(i))
+        self.create_hotkeys()
 
-            self.windows_bar_frame.add_window(window1_link)
+        self.windows_bar_frame.set_window(0)("")
+        self.mainloop()
+    
+    def create_hotkeys(self) -> None:
+        self.hotkeys: list[Callable] = []
 
-        keyboard.add_hotkey("right", callback=self.on_direction_click_side(1))
-        keyboard.add_hotkey("left", callback=self.on_direction_click_side(-1))
-        keyboard.add_hotkey("up", callback=self.on_direction_click_height(-1))
-        keyboard.add_hotkey("down", callback=self.on_direction_click_height(1))
+        self.hotkeys.append(keyboard.add_hotkey("right", callback=self.on_direction_click_side(1)))
+        self.hotkeys.append(keyboard.add_hotkey("left", callback=self.on_direction_click_side(-1)))
+        self.hotkeys.append(keyboard.add_hotkey("up", callback=self.on_direction_click_height(-1)))
+        self.hotkeys.append(keyboard.add_hotkey("down", callback=self.on_direction_click_height(1)))
         
-        keyboard.add_hotkey("backspace", callback=self.delete_char)
-        keyboard.add_hotkey("enter", callback=self.new_line)
+        self.hotkeys.append(keyboard.add_hotkey("backspace", callback=self.delete_char))
+        self.hotkeys.append(keyboard.add_hotkey("enter", callback=self.new_line))
 
         for i in ascii_lowercase.removeprefix("") + "=-/.":
-            keyboard.add_hotkey(i, callback=self.type_key(i, "n"))
-            keyboard.add_hotkey(f"ctrl+{i}", callback=self.type_key(i, "d"))
-            keyboard.add_hotkey(f"alt+{i}", callback=self.type_key(i, "u"))
+            self.hotkeys.append(keyboard.add_hotkey(i, callback=self.type_key(i, "n")))
+            self.hotkeys.append(keyboard.add_hotkey(f"ctrl+{i}", callback=self.type_key(i, "d")))
+            self.hotkeys.append(keyboard.add_hotkey(f"alt+{i}", callback=self.type_key(i, "u")))
         
         for i in ascii_lowercase.upper():
-            keyboard.add_hotkey(f"shift+{i}", callback=self.type_key(i, "n"))
-            keyboard.add_hotkey(f"ctrl+shift+{i}", callback=self.type_key(i, "d"))
-            keyboard.add_hotkey(f"alt+shift+{i}", callback=self.type_key(i, "u"))
+            self.hotkeys.append(keyboard.add_hotkey(f"shift+{i}", callback=self.type_key(i, "n")))
+            self.hotkeys.append(keyboard.add_hotkey(f"ctrl+shift+{i}", callback=self.type_key(i, "d")))
+            self.hotkeys.append(keyboard.add_hotkey(f"alt+shift+{i}", callback=self.type_key(i, "u")))
 
         for i in ("n", "d", "u"):
             if i == "n":
@@ -50,26 +53,36 @@ class App(ctk.CTk):
             else:
                 prefix = "alt+"
 
-            keyboard.add_hotkey(prefix + "space", callback=self.type_key(" ", i))
-            keyboard.add_hotkey(prefix + "shift+1", callback=self.type_key("+", i))
-            keyboard.add_hotkey(prefix + "altgr+-", callback=self.type_key("*", i))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "space", callback=self.type_key(" ", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "shift+1", callback=self.type_key("+", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "altgr+-", callback=self.type_key("*", i)))
 
-            keyboard.add_hotkey(prefix + "é", callback=self.type_key("0", i))
-            keyboard.add_hotkey(prefix + "1", callback=self.type_key("1", i))
-            keyboard.add_hotkey(prefix + "ě", callback=self.type_key("2", i))
-            keyboard.add_hotkey(prefix + "š", callback=self.type_key("3", i))
-            keyboard.add_hotkey(prefix + "č", callback=self.type_key("4", i))
-            keyboard.add_hotkey(prefix + "ř", callback=self.type_key("5", i))
-            keyboard.add_hotkey(prefix + "ž", callback=self.type_key("6", i))
-            keyboard.add_hotkey(prefix + "ý", callback=self.type_key("7", i))
-            keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i))
-            keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "é", callback=self.type_key("0", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "1", callback=self.type_key("1", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "ě", callback=self.type_key("2", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "š", callback=self.type_key("3", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "č", callback=self.type_key("4", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "ř", callback=self.type_key("5", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "ž", callback=self.type_key("6", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "ý", callback=self.type_key("7", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i)))
+            self.hotkeys.append(keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i)))
         
-        # keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
-        # keyboard.add_hotkey("ctrl+alt+l", callback=self.load)
+        # self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
+        # self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
+    
+    def clear_hotkeys(self) -> None:
+        for i in self.hotkeys:
+            keyboard.remove_hotkey(i)
+    
+    def new_window(self) -> None:
+        self.clear_hotkeys()
 
-        self.windows_bar_frame.set_window(0)("")
-        self.mainloop()
+        title = str(ctk.CTkInputDialog(text="New window name:").get_input())
+        self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self), title=title if title != "" else "Not defined"))
+        
+        self.after(10, lambda: self.create_hotkeys())
     
     def new_line(self):
         self.windows_bar_frame.active_window().new_line()
@@ -126,11 +139,18 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
 
 
 class WindowLink(ctk.CTkFrame):
-    def __init__(self, master, window: Window) -> None:
+    id: int = 0
+
+    def __init__(self, master, window: Window, title: str = "Undefined title") -> None:
         super().__init__(master=master, fg_color="#FF0000")
         self.window: Window = window
-        self.label = ctk.CTkLabel(self, text="Widnow 1")
+
+        self.label = ctk.CTkLabel(self, text=title)
         self.label.pack()
+
+        self.label.bind("<Button-1>", master.set_window(WindowLink.id))
+        self.bind("<Button-1>", master.set_window(WindowLink.id))
+        WindowLink.id += 1
     
     def render(self) -> None:
         self.window.place(x = 0, rely = 0.1, relwidth = 1, relheight = 0.9)
@@ -139,7 +159,7 @@ class WindowLink(ctk.CTkFrame):
         self.window.place_forget()
 
 class Window(ctk.CTkFrame):
-    def __init__(self, master, name: str = "") -> None:
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
@@ -151,8 +171,6 @@ class Window(ctk.CTkFrame):
         
         self.cursor.lift()
         self.cursor.place(x = self.lines[0].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
-
-        self.type_key(name, "n")()
     
     def rerender(self, height_change: int = 0) -> None:
         for i, v in enumerate(self.lines):
