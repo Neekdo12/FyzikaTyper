@@ -5,7 +5,7 @@ from line import Line
 
 class Window(ctk.CTkFrame):
     def __init__(self, master, content: list[list[tuple[str ,str]]] | None = None) -> None:
-        super().__init__(master=master)
+        super().__init__(master=master, fg_color="black")
 
         self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
         self.line = 0

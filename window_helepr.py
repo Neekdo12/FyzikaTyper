@@ -4,7 +4,7 @@ from window import Window
 
 class WindowSwitcher(ctk.CTkScrollableFrame):
     def __init__(self, master) -> None:
-        super().__init__(master=master, orientation="horizontal", corner_radius=0)
+        super().__init__(master=master, orientation="horizontal", corner_radius=0, fg_color="#000000")
         self._scrollbar.configure(height = 5)
 
         self.a_window: int = 0
@@ -14,7 +14,7 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
     
     def add_window(self, window_link: WindowLink, main = False) -> None:
         self.windows.append(window_link)
-        window_link.pack(side = "left", fill = "y", expand = True, padx = 3, pady = 1)
+        window_link.pack(side = "left", fill = "y", expand = True, padx = 2, pady = 1)
 
         if main:
             self.a_window = len(self.windows) - 1
@@ -36,12 +36,12 @@ class WindowLink(ctk.CTkFrame):
     id: int = 0
 
     def __init__(self, master, window: Window, title: str = "Undefined title") -> None:
-        super().__init__(master=master, fg_color="#FF0000")
+        super().__init__(master=master, fg_color="#161414")
         self.window: Window = window
         self.title = title
 
         self.label = ctk.CTkLabel(self, text=title)
-        self.label.pack()
+        self.label.pack(ipadx = 10, ipady = 1)
 
         self.label.bind("<Button-1>", master.set_window(WindowLink.id))
         self.bind("<Button-1>", master.set_window(WindowLink.id))
