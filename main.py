@@ -1,4 +1,3 @@
-from sys import prefix
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
@@ -25,61 +24,6 @@ class App(ctk.CTk):
 
             self.windows_bar_frame.add_window(window1_link)
 
-        self.mainloop()
-
-class WindowSwitcher(ctk.CTkScrollableFrame):
-    def __init__(self, master) -> None:
-        super().__init__(master=master, orientation="horizontal")
-        self._scrollbar.configure(height = 5)
-
-        self.active_window = 0
-        self.windows = []
-
-        self.place(x = 0, y = 0, relwidth = 1, relheight = 0.1)
-    
-    def add_window(self, window_link: WindowLink, main = False) -> None:
-        self.windows.append(window_link)
-        window_link.pack(side = "left", fill = "y", expand = True, padx = 3, pady = 1)
-
-        if main:
-            self.active_window = len(self.windows) - 1
-            window_link.render()
-
-    def set_window(self, window):
-        def run(event): 
-            self.windows[self.active_window].clear()
-            self.active_window = window
-            self.windows[self.active_window].render()
-        
-        return run
-
-
-class WindowLink(ctk.CTkFrame):
-    def __init__(self, master, window: Window) -> None:
-        super().__init__(master=master, fg_color="#FF0000", width=100, height=500)
-        self.window: Window = window
-        self.label = ctk.CTkLabel(self, text="Widnow 1")
-        self.label.pack()
-    
-    def render(self) -> None:
-        self.window.place(x = 0, rely = 0.1, relwidth = 1, relheight = 0.9)
-    
-    def clear(self) -> None:
-        self.window.place_forget()
-
-class Window(ctk.CTkFrame):
-    def __init__(self, master, name: str = "") -> None:
-        super().__init__(master=master)
-
-        self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
-        self.line = 0
-
-        self.lines = [Line(self, text="")]
-        for i, v in enumerate(self.lines):
-            v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
-        
-        self.cursor.lift()
-        self.cursor.place(x = self.lines[0].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
         keyboard.add_hotkey("right", callback=self.on_direction_click_side(1))
         keyboard.add_hotkey("left", callback=self.on_direction_click_side(-1))
         keyboard.add_hotkey("up", callback=self.on_direction_click_height(-1))
@@ -121,8 +65,92 @@ class Window(ctk.CTkFrame):
             keyboard.add_hotkey(prefix + "á", callback=self.type_key("8", i))
             keyboard.add_hotkey(prefix + "í", callback=self.type_key("9", i))
         
-        keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
-        keyboard.add_hotkey("ctrl+alt+l", callback=self.load)
+        # keyboard.add_hotkey("ctrl+alt+s", callback=self.save)
+        # keyboard.add_hotkey("ctrl+alt+l", callback=self.load)
+
+        self.windows_bar_frame.set_window(0)("")
+        self.mainloop()
+    
+    def new_line(self):
+        self.windows_bar_frame.active_window().new_line()
+    
+    def delete_char(self):
+        self.windows_bar_frame.active_window().delete_char()
+    
+    def on_direction_click_side(self, val: int):
+        def run():
+            self.windows_bar_frame.active_window().on_direction_click_side(val)()
+        
+        return run
+
+    def on_direction_click_height(self, val):
+        def run():
+            self.windows_bar_frame.active_window().on_direction_click_height(val)()
+        
+        return run
+    
+    def type_key(self, key, type):
+        def run():
+            self.windows_bar_frame.active_window().type_key(key, type)()
+        
+        return run
+
+class WindowSwitcher(ctk.CTkScrollableFrame):
+    def __init__(self, master) -> None:
+        super().__init__(master=master, orientation="horizontal", corner_radius=0)
+        self._scrollbar.configure(height = 5)
+
+        self.a_window: int = 0
+        self.windows: list[WindowLink] = []
+
+        self.place(x = 0, y = 0, relwidth = 1, relheight = 0.1)
+    
+    def add_window(self, window_link: WindowLink, main = False) -> None:
+        self.windows.append(window_link)
+        window_link.pack(side = "left", fill = "y", expand = True, padx = 3, pady = 1)
+
+        if main:
+            self.a_window = len(self.windows) - 1
+            window_link.render()
+
+    def set_window(self, window):
+        def run(event): 
+            self.windows[self.a_window].clear()
+            self.a_window = window
+            self.windows[self.a_window].render()
+        
+        return run
+
+    def active_window(self) -> Window:
+        return self.windows[self.a_window].window
+
+
+class WindowLink(ctk.CTkFrame):
+    def __init__(self, master, window: Window) -> None:
+        super().__init__(master=master, fg_color="#FF0000")
+        self.window: Window = window
+        self.label = ctk.CTkLabel(self, text="Widnow 1")
+        self.label.pack()
+    
+    def render(self) -> None:
+        self.window.place(x = 0, rely = 0.1, relwidth = 1, relheight = 0.9)
+    
+    def clear(self) -> None:
+        self.window.place_forget()
+
+class Window(ctk.CTkFrame):
+    def __init__(self, master, name: str = "") -> None:
+        super().__init__(master=master)
+
+        self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
+        self.line = 0
+
+        self.lines = [Line(self, text="")]
+        for i, v in enumerate(self.lines):
+            v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
+        
+        self.cursor.lift()
+        self.cursor.place(x = self.lines[0].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
 
         self.type_key(name, "n")()
     
