@@ -1,3 +1,4 @@
+from asyncio.constants import LOG_THRESHOLD_FOR_CONNLOST_WRITES
 from typing import Callable
 import customtkinter as ctk
 import keyboard
@@ -73,10 +74,27 @@ class App(ctk.CTk):
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+left", callback=self.on_click_change_window(-1)))
     
     def clear_hotkeys(self) -> None:
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
+    
+    def on_click_change_window(self, val):
+        def run():
+            ac, len_windows = self.windows_bar_frame.a_window, len(self.windows_bar_frame.windows)
+
+            if ac + val >= len_windows:
+                ac = 0
+            elif ac + val == -1:
+                ac = len_windows - 1
+            else:
+                ac += val
+            
+            self.windows_bar_frame.set_window(ac)(None)
+
+        return run
     
     def new_window(self) -> None:
         self.clear_hotkeys()

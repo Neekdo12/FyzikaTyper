@@ -20,7 +20,7 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
             self.a_window = len(self.windows) - 1
             window_link.render()
 
-    def set_window(self, window):
+    def set_window(self, window: int):
         def run(event): 
             self.windows[self.a_window].clear()
             self.a_window = window
