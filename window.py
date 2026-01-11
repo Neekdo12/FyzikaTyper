@@ -67,7 +67,7 @@ class Window(ctk.CTkFrame):
             if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
                 self.lines[self.line].delete()
 
-            elif key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "y":
+            elif key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "Y":
                 self.lines[self.line].delete()
 
             self.lines[self.line].add_key(key, type)
