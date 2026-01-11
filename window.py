@@ -9,6 +9,7 @@ class Window(ctk.CTkFrame):
 
         self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
         self.line = 0
+        self.style_lines = []
 
         if content is None:
             self.lines = [Line(self, text="")]
@@ -20,14 +21,28 @@ class Window(ctk.CTkFrame):
                 self.lines.append(Line(self, v))
                 self.lines[-1].place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
         
+        self.after(10, self.place_lines)
+        
         self.cursor.lift()
         self.cursor.place(x = self.lines[0].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
+    
     
     def rerender(self, height_change: int = 0) -> None:
         for i, v in enumerate(self.lines):
             v.place_forget()
             v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
+        
+        for i in self.style_lines:
+            i.place_forget()
+        self.style_lines.clear()        
+        self.after(10, self.place_lines)
+
         self.on_direction_click_height(height_change)()
+    
+    def place_lines(self, ):
+        for i in range(1, 10):
+            self.style_lines.append(ctk.CTkFrame(self, height=2))
+            self.style_lines[-1].place(x = 0, rely = 0.1 * i, relwidth = 1)
     
     def load(self) -> None:
         list(map(lambda line: line.place_forget(), self.lines))
@@ -67,12 +82,13 @@ class Window(ctk.CTkFrame):
             if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
                 self.lines[self.line].delete()
 
-            elif key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "Y":
+            if key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "Y":
                 self.lines[self.line].delete()
 
             self.lines[self.line].add_key(key, type)
             self.rerender_line(self.line)
             self.on_direction_click_side(0)()
+
         return run
     
     def delete_char(self) -> None:

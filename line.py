@@ -1,3 +1,5 @@
+from sys import orig_argv
+from time import process_time
 import customtkinter as ctk
 
 class Line(ctk.CTkFrame):
@@ -10,6 +12,7 @@ class Line(ctk.CTkFrame):
         self.small_letter_site = self.small_font.measure("B") + 0.5
 
         self.labels: list[ctk.CTkLabel] = []
+        self.unfinishd_labels = False
 
         if isinstance(text, str):
             self.letter_list: list[Letter] = [Letter(i) for i in text]
@@ -69,6 +72,7 @@ class Line(ctk.CTkFrame):
         self.dict_pointer = 0
         self.dict_helper: str = list(self.render_dict.keys())[0][1]
         for i in self.render_dict:
+            self.unfinishd_labels = True
             self.after(10, self.add_label(self.render_dict[i], i))
 
     def add_label(self, text, type):
@@ -82,15 +86,23 @@ class Line(ctk.CTkFrame):
             elif type[1] == "u":
                 self.labels.append(ctk.CTkLabel(self, text=text, font=self.small_font, anchor="nw"))
                 self.labels[-1].pack(side = "left")
+            
+            self.unfinishd_labels = False
         
         return run
     
     def rerender(self) -> None:
-        for i in self.labels:
-            i.pack_forget()
-        self.labels.clear()
-        
-        self.render()
+        def run():
+            for i in self.labels:
+                i.pack_forget()
+            self.labels.clear()
+
+            self.render()
+
+        if self.unfinishd_labels:
+            self.after(10, run)
+        else:
+            run()
     
     def recount(self) -> None:
         self.dict_counter = 0

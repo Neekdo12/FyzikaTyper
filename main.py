@@ -12,7 +12,7 @@ class App(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
 
-        self.geometry("700x300")
+        self.geometry("700x330")
         self.title("Typer")
         self.config(bg="black")
 
@@ -125,6 +125,7 @@ class App(ctk.CTk):
     def type_key(self, key, type):
         def run():
             self.windows_bar_frame.active_window().type_key(key, type)()
+            # self.windows_bar_frame.active_window().rerender()
         
         return run
 
