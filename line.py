@@ -69,15 +69,21 @@ class Line(ctk.CTkFrame):
         self.dict_pointer = 0
         self.dict_helper: str = list(self.render_dict.keys())[0][1]
         for i in self.render_dict:
-            if i[1] == "n":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.normal_font))
+            self.after(10, self.add_label(self.render_dict[i], i))
+
+    def add_label(self, text, type):
+        def run():
+            if type[1] == "n":
+                self.labels.append(ctk.CTkLabel(self, text=text, font=self.normal_font))
                 self.labels[-1].pack(side = "left")
-            elif i[1] == "d":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.small_font, anchor="sw"))
+            elif type[1] == "d":
+                self.labels.append(ctk.CTkLabel(self, text=text, font=self.small_font, anchor="sw"))
                 self.labels[-1].pack(side = "left")
-            elif i[1] == "u":
-                self.labels.append(ctk.CTkLabel(self, text=self.render_dict[i], font=self.small_font, anchor="nw"))
+            elif type[1] == "u":
+                self.labels.append(ctk.CTkLabel(self, text=text, font=self.small_font, anchor="nw"))
                 self.labels[-1].pack(side = "left")
+        
+        return run
     
     def rerender(self) -> None:
         for i in self.labels:
