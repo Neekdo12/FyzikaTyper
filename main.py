@@ -7,6 +7,7 @@ import json
 
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
+import docx_helper
 
 class App(ctk.CTk):
     def __init__(self) -> None:
@@ -74,12 +75,18 @@ class App(ctk.CTk):
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+e", callback=self.export))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+left", callback=self.on_click_change_window(-1)))
     
     def clear_hotkeys(self) -> None:
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
+    
+    def export(self):
+        self.save()
+        docx_helper.export(self.save_data)
+        print("Export done")
     
     def on_click_change_window(self, val):
         def run():
