@@ -1,9 +1,7 @@
 from docx import Document
 import json
 
-document = Document("test.docx")
-
-def export(data):
+def export(data, document):
     for para in document.paragraphs:
         for i in data:
             if f"zt-{i}" == para.text:

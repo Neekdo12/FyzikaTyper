@@ -1,10 +1,11 @@
-from asyncio.constants import LOG_THRESHOLD_FOR_CONNLOST_WRITES
 from typing import Callable
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
 import json
+from docx import Document
 
+from settings import Settings
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
 import docx_helper
@@ -12,6 +13,8 @@ import docx_helper
 class App(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
+
+        self.settings = Settings()
 
         self.geometry("700x330")
         self.title("Typer")
@@ -85,7 +88,7 @@ class App(ctk.CTk):
     
     def export(self):
         self.save()
-        docx_helper.export(self.save_data)
+        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))))
         print("Export done")
     
     def on_click_change_window(self, val):
@@ -146,11 +149,11 @@ class App(ctk.CTk):
         for i in self.windows_bar_frame.windows:
             self.save_data[i.title] = i.window.save()
         
-        with open("save.json", "w") as file:
+        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "w") as file:
             json.dump(self.save_data, file)
     
     def load(self):
-        with open("save.json", "r") as file:
+        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "r") as file:
             self.save_data = json.load(file)
         
         for i in self.save_data:
