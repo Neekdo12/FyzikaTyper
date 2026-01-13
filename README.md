@@ -37,5 +37,5 @@ This project is licensed under the **MIT License**.
 You are free to use, modify, and distribute this software with minimal restrictions.  
 See the `LICENSE` file for full license text.
 
-### Creators
-Created with AI help
+>### Creators
+>Created with AI help
