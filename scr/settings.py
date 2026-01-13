@@ -48,27 +48,46 @@ class SettingsSetterPart(ctk.CTkFrame):
     def __init__(self, master, settings: Settings):
         super().__init__(master, height=100)
 
-class SettingsSetterPartPrefix(SettingsSetterPart):
-    def __init__(self, master, settings):
+class SettingsSetterPartEntry(SettingsSetterPart):
+    def __init__(self, master, settings, text, settings_name, default):
         super().__init__(master, settings)
 
-        self.info_label = ctk.CTkLabel(self, text="Word prefix")
-        self.tk_var = ctk.StringVar(self, value=settings("prefix", lambda: "zt"))
+        self.info_label = ctk.CTkLabel(self, text=text)
+        self.tk_var = ctk.StringVar(self, value=settings(settings_name, lambda: default))
         self.entry = ctk.CTkEntry(self, textvariable=self.tk_var)
 
-        self.info_label.pack(side = "left")
-        self.entry.pack(side = "right")
+        self.info_label.pack(side = "left", padx = 3, pady = 3)
+        self.entry.pack(side = "right", padx = 3, pady = 3)
     
 class SettingsSetter(ctk.CTkToplevel):
-    def __init__(self, settings, master):
+    def __init__(self, settings: Settings, master):
         super().__init__()
 
-        self.geometry("300x500")
+        self.geometry("500x500")
+        self.settings = settings
 
-        self.prefix = SettingsSetterPartPrefix(self, settings)
+        self.prefix = SettingsSetterPartEntry(self, settings, "Prefix for importing into word", "prefix", "zt")
+
+        self.buttons = ctk.CTkFrame(self)
+        self.buttons_ok = ctk.CTkButton(self.buttons, text="ok", command=self.ok)
+        self.buttons_close = ctk.CTkButton(self.buttons, text="close")
 
         self.prefix.place(x = 0, y = 0, relwidth = 1, relheight = 1 / 13)
+
+        self.buttons_ok.pack(side = "right", expand = True, fill = "both", padx = 3, pady = 3)
+        self.buttons_close.pack(side = "left", expand = True, fill = "both", padx = 3, pady = 3)
+        self.buttons.place(relx = 0, rely = 1 - 1/13, relwidth = 1, relheight = 1/13)
 
         self.grab_set()
         self.focus()
         master.wait_window(self)
+    
+    def ok(self):
+        if self.prefix.tk_var == "":
+            raise Exception("Empty prefix entry - invalid value")
+        
+        self.settings.data["prefix"] = self.prefix.tk_var.get()
+
+        self.settings.save()
+        self.grab_release()
+        self.destroy()

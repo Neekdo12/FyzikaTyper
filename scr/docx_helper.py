@@ -1,10 +1,10 @@
 from docx import Document
 import json
 
-def export(data, document):
+def export(data, document, prefix):
     for para in document.paragraphs:
         for i in data:
-            if f"zt-{i}" == para.text:
+            if f"{prefix}-{i}" == para.text:
                 para.add_run("\n")
                 para.style = "upper"
                 for index, line in enumerate(data[i]):

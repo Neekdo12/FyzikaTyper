@@ -92,7 +92,7 @@ class App(ctk.CTk):
     
     def export(self):
         self.save()
-        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))))
+        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings("prefix", lambda: "zt"))
         print("Export done")
     
     def on_click_change_window(self, val):
@@ -199,7 +199,6 @@ class App(ctk.CTk):
     
     def change_settings(self):
         self.setter = SettingsSetter(self.settings, self)
-        print("printi")
 
 
 if __name__ == "__main__":
