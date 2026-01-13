@@ -5,7 +5,7 @@ from string import ascii_lowercase
 import json
 from docx import Document
 
-from settings import Settings
+from settings import Settings, SettingsSetter
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
 import docx_helper
@@ -76,6 +76,7 @@ class App(ctk.CTk):
             self.hotkeys.append(keyboard.add_hotkey(prefix + "shift+í", callback=self.type_key("9", i)))
         
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+p", callback=self.change_settings))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+s", callback=self.new_save))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+n", callback=self.new_file))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
@@ -195,6 +196,10 @@ class App(ctk.CTk):
     def reload(self):
         for i in self.windows_bar_frame.windows.copy():
             self.windows_bar_frame.remove_window(i)
+    
+    def change_settings(self):
+        self.setter = SettingsSetter(self.settings, self)
+        print("printi")
 
 
 if __name__ == "__main__":
