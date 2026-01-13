@@ -28,7 +28,7 @@ class App(ctk.CTk):
 
         self.create_hotkeys()
 
-        self.windows_bar_frame.set_window(0)("")
+        self.windows_bar_frame.set_window(list(self.windows_bar_frame.windows)[0])("")
         self.mainloop()
     
     def create_hotkeys(self) -> None:
@@ -76,7 +76,10 @@ class App(ctk.CTk):
             self.hotkeys.append(keyboard.add_hotkey(prefix + "shift+í", callback=self.type_key("9", i)))
         
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+s", callback=self.new_save))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+n", callback=self.new_file))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+l", callback=self.load))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+l", callback=self.force_load))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+e", callback=self.export))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
@@ -95,12 +98,14 @@ class App(ctk.CTk):
         def run():
             ac, len_windows = self.windows_bar_frame.a_window, len(self.windows_bar_frame.windows)
 
+            """
             if ac + val >= len_windows:
                 ac = 0
             elif ac + val == -1:
                 ac = len_windows - 1
             else:
                 ac += val
+            """
             
             self.windows_bar_frame.set_window(ac)(None)
 
@@ -147,10 +152,29 @@ class App(ctk.CTk):
         self.save_data = {}
 
         for i in self.windows_bar_frame.windows:
-            self.save_data[i.title] = i.window.save()
+            self.save_data[self.windows_bar_frame.windows[i].title] = self.windows_bar_frame.windows[i].window.save()
         
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "w") as file:
             json.dump(self.save_data, file)
+    
+    def new_save(self):
+        self.save()
+
+        self.settings.data["save"] = self.settings.create_save().removesuffix(".json") + ".json"
+
+        with open(self.settings.data["save"], "w") as file:
+            json.dump(self.save_data, file, indent=4)
+    
+    def new_file(self):
+        self.save()
+        self.reload()
+
+        title = str(ctk.CTkInputDialog(text="New window name:").get_input())
+        self.settings.data["save"] = self.settings.create_save().removesuffix(".json") + ".json"
+        with open(self.settings.data["save"], "w") as file:
+            json.dump({title: [[]]}, file, indent=4)
+        
+        self.load()
     
     def load(self):
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "r") as file:
@@ -158,6 +182,19 @@ class App(ctk.CTk):
         
         for i in self.save_data:
             self.create_window(i, self.save_data[i])
+    
+    def force_load(self):
+        self.reload()
+
+        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]), True), "r") as file:
+            self.save_data = json.load(file)
+        
+        for i in self.save_data:
+            self.create_window(i, self.save_data[i])
+    
+    def reload(self):
+        for i in self.windows_bar_frame.windows.copy():
+            self.windows_bar_frame.remove_window(i)
 
 
 if __name__ == "__main__":

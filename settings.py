@@ -13,6 +13,10 @@ class SettingsHelper():
             return filedialog.askopenfilename(filetypes=filetype, initialdir="./")
 
         return run
+    
+    def create_save(self):
+        print("open")
+        return filedialog.asksaveasfilename(filetypes=self.file_types["json"])
 
 class Settings(SettingsHelper):
     def __init__(self, path: str = "settings.json"):
@@ -22,14 +26,20 @@ class Settings(SettingsHelper):
 
         self.load()
     
-    def __call__(self, param: str, ask):
-        if param in self.data:
+    def __call__(self, param: str, ask, rr: bool = False):
+        if param in self.data and not rr:
+            self.save()
             return self.data[param]
         
         self.data[param] = ask()
+        self.save()
         return self.data[param]
     
     def load(self):
         with open(self.path, "r") as file:
             self.data = json.load(file)
+    
+    def save(self):
+        with open(self.path, "w") as file:
+            json.dump(self.data, file, indent=4)
     
