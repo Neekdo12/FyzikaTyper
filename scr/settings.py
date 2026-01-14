@@ -1,5 +1,6 @@
 import json
 from tkinter import filedialog
+from typing import Callable
 import customtkinter as ctk
 
 class SettingsHelper():
@@ -27,12 +28,12 @@ class Settings(SettingsHelper):
 
         self.load()
     
-    def __call__(self, param: str, ask, rr: bool = False):
+    def __call__(self, param: str, ask: Callable | str, rr: bool = False):
         if param in self.data and not rr:
             self.save()
             return self.data[param]
         
-        self.data[param] = ask()
+        self.data[param] = ask() if not (isinstance(ask, str)) else ask
         self.save()
         return self.data[param]
     

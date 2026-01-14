@@ -20,6 +20,9 @@ class App(ctk.CTk):
         self.title("Typer")
         self.config(bg="black")
 
+        self.down_index = False
+        self.up_index = False
+
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
 
         # self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self), title="My first window"))
@@ -86,6 +89,9 @@ class App(ctk.CTk):
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+e", callback=self.export))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+left", callback=self.on_click_change_window(-1)))
+
+        self.hotkeys.append(keyboard.add_hotkey("ctrl", callback=self.set_down_index))
+        self.hotkeys.append(keyboard.add_hotkey("alt", callback=self.set_up_index))
     
     def clear_hotkeys(self) -> None:
         for i in self.hotkeys:
@@ -139,10 +145,17 @@ class App(ctk.CTk):
         
         return run
     
-    def type_key(self, key, type):
+    def type_key(self, key, type2: str):
         def run():
+            type = type2
+            if self.settings("index_mode", "toggle") == "hold":
+                if self.up_index:
+                    type = "u"
+                
+                if self.down_index:
+                    type = "d"
+            
             self.windows_bar_frame.active_window().type_key(key, type)()
-            # self.windows_bar_frame.active_window().rerender()
         
         return run
 
@@ -218,6 +231,12 @@ class App(ctk.CTk):
     
     def close_window(self):
         self.windows_bar_frame.remove_window(self.windows_bar_frame.a_window)
+    
+    def set_up_index(self):
+        self.up_index = not self.up_index
+    
+    def set_down_index(self):
+        self.down_index = not self.down_index
 
 
 if __name__ == "__main__":
