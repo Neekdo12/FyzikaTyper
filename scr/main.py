@@ -20,8 +20,10 @@ class App(ctk.CTk):
         self.title("Typer")
         self.config(bg="black")
 
+        self.down_index_smart = False
         self.down_index = False
         self.up_index = False
+        self.up_index_smart = False
 
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
 
@@ -148,12 +150,27 @@ class App(ctk.CTk):
     def type_key(self, key, type2: str):
         def run():
             type = type2
+
             if self.settings("index_mode", "toggle") == "hold":
                 if self.up_index:
                     type = "u"
                 
                 if self.down_index:
                     type = "d"
+            
+            if self.settings("smart_index", "off") == "on":
+                if self.up_index_smart:
+                    type = "u"
+                
+                if self.down_index_smart:
+                    type = "d"
+            
+            if key in ascii_lowercase or key in ascii_lowercase.upper():
+                self.down_index_smart = True
+            
+            elif key == " ":
+                self.down_index_smart = False
+                type = "n"
             
             self.windows_bar_frame.active_window().type_key(key, type)()
         
@@ -234,9 +251,13 @@ class App(ctk.CTk):
     
     def set_up_index(self):
         self.up_index = not self.up_index
+        self.down_index_smart = False
+        self.up_index_smart = False
     
     def set_down_index(self):
         self.down_index = not self.down_index
+        self.down_index_smart = False
+        self.up_index_smart = False
 
 
 if __name__ == "__main__":
