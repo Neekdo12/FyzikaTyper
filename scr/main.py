@@ -151,13 +151,17 @@ class App(ctk.CTk):
         self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self, content=content), title=title if title != "" else "Not defined"))
     
     def save(self):
+        print("startings to save...")
         self.save_data = {}
 
         for i in self.windows_bar_frame.windows:
+            print(f"saving: {i}")
             self.save_data[self.windows_bar_frame.windows[i].title] = self.windows_bar_frame.windows[i].window.save()
         
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "w") as file:
             json.dump(self.save_data, file)
+        
+        print("saving done")
     
     def new_save(self):
         self.save()
@@ -166,6 +170,7 @@ class App(ctk.CTk):
 
         with open(self.settings.data["save"], "w") as file:
             json.dump(self.save_data, file, indent=4)
+        print("Created new savefile")
     
     def new_file(self):
         self.save()
@@ -179,24 +184,34 @@ class App(ctk.CTk):
         self.load()
     
     def load(self):
+        print("started loading...")
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "r") as file:
             self.save_data = json.load(file)
         
         for i in self.save_data:
+            print(f"loading: {i}")
             self.create_window(i, self.save_data[i])
+        
+        print("loading done")
     
     def force_load(self):
+        print("started loading...")
         self.reload()
 
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]), True), "r") as file:
             self.save_data = json.load(file)
         
         for i in self.save_data:
+            print(f"loading: {i}")
             self.create_window(i, self.save_data[i])
+        
+        print("loading done")
     
     def reload(self):
+        print("Saterted reloading")
         for i in self.windows_bar_frame.windows.copy():
             self.windows_bar_frame.remove_window(i)
+        print("Reloading done")
     
     def change_settings(self):
         self.setter = SettingsSetter(self.settings, self)
