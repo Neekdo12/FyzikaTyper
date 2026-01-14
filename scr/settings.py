@@ -81,6 +81,8 @@ class SettingsSetter(ctk.CTkToplevel):
         self.prefix = SettingsSetterPartEntry(self, settings, "Prefix for importing into word", "prefix", "zt")
         self.index_mode = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "index_mode", "toggle", ["toggle", "hold"])
         self.smart_index = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "smart_index", "off", ["off", "on"])
+        self.export_style = SettingsSetterPartBox(self, settings, "What style should be used for exporting into word document", "export_style", "internal", ["none", "oninternal", "custom"])
+        self.custom_style = SettingsSetterPartEntry(self, settings, "Name of the custom style", "custom_style", "zt-style")
 
         self.buttons = ctk.CTkFrame(self)
         self.buttons_ok = ctk.CTkButton(self.buttons, text="ok", command=self.ok)
@@ -89,6 +91,8 @@ class SettingsSetter(ctk.CTkToplevel):
         self.prefix.place(x = 0, y = 0, relwidth = 1, relheight = 1 / 13)
         self.index_mode.place(x = 0, rely = 1 / 13, relwidth = 1, relheight = 1 / 13)
         self.smart_index.place(x = 0, rely = 2 / 13, relwidth = 1, relheight = 1 / 13)
+        self.export_style.place(x = 0, rely = 3/ 13, relwidth = 1, relheight = 1 / 13)
+        self.custom_style.place(x = 0, rely = 4 / 13, relwidth = 1, relheight = 1 / 13)
 
         self.buttons_ok.pack(side = "right", expand = True, fill = "both", padx = 3, pady = 3)
         self.buttons_close.pack(side = "left", expand = True, fill = "both", padx = 3, pady = 3)
@@ -105,6 +109,8 @@ class SettingsSetter(ctk.CTkToplevel):
         self.settings.data["prefix"] = self.prefix.tk_var.get()
         self.settings.data["index_mode"] = self.index_mode.tk_var.get()
         self.settings.data["smart_index"] = self.smart_index.tk_var.get()
+        self.settings.data["export_style"] = self.export_style.tk_var.get()
+        self.settings.data["custom_style"] = self.custom_style.tk_var.get()
 
         self.settings.save()
         self.grab_release()
