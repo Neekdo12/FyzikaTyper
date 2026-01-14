@@ -76,6 +76,7 @@ class App(ctk.CTk):
             self.hotkeys.append(keyboard.add_hotkey(prefix + "shift+í", callback=self.type_key("9", i)))
         
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+s", callback=self.save))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+c", callback=self.close_window))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+p", callback=self.change_settings))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+s", callback=self.new_save))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+n", callback=self.new_file))
@@ -199,6 +200,9 @@ class App(ctk.CTk):
     
     def change_settings(self):
         self.setter = SettingsSetter(self.settings, self)
+    
+    def close_window(self):
+        self.windows_bar_frame.remove_window(self.windows_bar_frame.a_window)
 
 
 if __name__ == "__main__":

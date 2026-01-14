@@ -58,6 +58,17 @@ class SettingsSetterPartEntry(SettingsSetterPart):
 
         self.info_label.pack(side = "left", padx = 3, pady = 3)
         self.entry.pack(side = "right", padx = 3, pady = 3)
+
+class SettingsSetterPartBox(SettingsSetterPart):
+    def __init__(self, master, settings, text, settings_name, default, options: list[str]):
+        super().__init__(master, settings)
+
+        self.info_label = ctk.CTkLabel(self, text=text)
+        self.tk_var = ctk.StringVar(self, value=settings(settings_name, lambda: default))
+        self.box = ctk.CTkOptionMenu(self, values=options, variable=self.tk_var)
+
+        self.info_label.pack(side = "left", padx = 3, pady = 3)
+        self.box.pack(side = "right", padx = 3, pady = 3)
     
 class SettingsSetter(ctk.CTkToplevel):
     def __init__(self, settings: Settings, master):
@@ -67,12 +78,16 @@ class SettingsSetter(ctk.CTkToplevel):
         self.settings = settings
 
         self.prefix = SettingsSetterPartEntry(self, settings, "Prefix for importing into word", "prefix", "zt")
+        self.index_mode = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "index_mode", "toggle", ["toggle", "hold"])
+        self.smart_index = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "smart_index", "off", ["off", "on"])
 
         self.buttons = ctk.CTkFrame(self)
         self.buttons_ok = ctk.CTkButton(self.buttons, text="ok", command=self.ok)
         self.buttons_close = ctk.CTkButton(self.buttons, text="close")
 
         self.prefix.place(x = 0, y = 0, relwidth = 1, relheight = 1 / 13)
+        self.index_mode.place(x = 0, rely = 1 / 13, relwidth = 1, relheight = 1 / 13)
+        self.smart_index.place(x = 0, rely = 2 / 13, relwidth = 1, relheight = 1 / 13)
 
         self.buttons_ok.pack(side = "right", expand = True, fill = "both", padx = 3, pady = 3)
         self.buttons_close.pack(side = "left", expand = True, fill = "both", padx = 3, pady = 3)
@@ -85,8 +100,10 @@ class SettingsSetter(ctk.CTkToplevel):
     def ok(self):
         if self.prefix.tk_var == "":
             raise Exception("Empty prefix entry - invalid value")
-        
+
         self.settings.data["prefix"] = self.prefix.tk_var.get()
+        self.settings.data["index_mode"] = self.index_mode.tk_var.get()
+        self.settings.data["smart_index"] = self.smart_index.tk_var.get()
 
         self.settings.save()
         self.grab_release()
