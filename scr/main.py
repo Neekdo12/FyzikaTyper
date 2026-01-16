@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 import customtkinter as ctk
 import keyboard
 from string import ascii_lowercase
@@ -190,7 +190,7 @@ class App(ctk.CTk):
         
         return run
 
-    def create_window(self, title: str, content: window_t) -> None:
+    def create_window(self, title: str, content: Optional[window_t]) -> None:
         self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self, content=content), title=title if title != "" else "Not defined"))
     
     def save(self) -> None:

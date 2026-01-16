@@ -5,7 +5,7 @@ from docx.styles.style import BaseStyle
 from docx.styles.styles import Styles
 from settings import Settings
 
-def export(data, document: Document, settings: Settings, finall: bool = False):
+def export(data, document: Document, settings: Settings, finall: bool = False) -> None:
     print("Started exporintg")
 
     for paragraph in document.paragraphs:
