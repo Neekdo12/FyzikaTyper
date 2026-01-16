@@ -5,6 +5,7 @@ from docx.styles.style import BaseStyle
 from docx.styles.styles import Styles
 from settings import Settings
 
+# Exprot document into word
 def export(data, document: Document, settings: Settings, finall: bool = False) -> None:
     print("Started exporintg")
 
@@ -19,6 +20,8 @@ def export(data, document: Document, settings: Settings, finall: bool = False) -
 
                 if settings("export_style", "internal") == "internal":
                     styles: Styles = document.styles
+
+                    # Creates style if needed
                     if "upper" not in styles:
                         upper: BaseStyle = styles.add_style("upper", WD_STYLE_TYPE.PARAGRAPH)
                         upper.quick_style = True
@@ -33,6 +36,8 @@ def export(data, document: Document, settings: Settings, finall: bool = False) -
                 
                 for index, line in enumerate(data[window]):
                     for letter in line:
+
+                        # Main writing loggic
                         match letter[1]:
                             case "n":
                                 paragraph.add_run(letter[0])
@@ -47,6 +52,8 @@ def export(data, document: Document, settings: Settings, finall: bool = False) -
     document.save(str(settings("docx", settings.chose_file(settings.file_types["docx"]))))
     print("Export done")
 
+
+# Importing from word document
 def docx_import(document: Document, settings) -> dict[str, list[list[tuple[str, str]]]]:
     print("Started importing...")
     data: dict[str, list[list[tuple[str, str]]]] = {}

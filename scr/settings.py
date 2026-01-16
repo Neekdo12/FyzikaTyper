@@ -6,6 +6,7 @@ import customtkinter as ctk
 
 class SettingsHelper():
     def __init__(self) -> None:
+        # Dictionary of types of the used files
         self.file_types: dict[str, tuple[tuple[str, str], tuple[str, str]]] = {
             "docx": (('word documents', '*.docx'), ('All files', '*.*')),
             "json": (('json data', '*.json'), ('All files', '*.*'))
@@ -29,6 +30,7 @@ class Settings(SettingsHelper):
         self.load()
     
     def __call__(self, param: str, ask: Callable | str, rr: bool = False) -> str | float | int:
+        # Returns value or creats it from default value -> ask
         if param in self.data and not rr:
             self.save()
             return self.data[param]
@@ -46,10 +48,12 @@ class Settings(SettingsHelper):
             json.dump(self.data, file, indent=4)
 
 class SettingsSetterPart(ctk.CTkFrame):
+    # In the future will include colors and iding of settings parts
     def __init__(self, master, settings: Settings) -> None:
         super().__init__(master, height=100)
 
 class SettingsSetterPartEntry(SettingsSetterPart):
+    # Part for geting one string from customtkinter entry
     def __init__(self, master, settings, text, settings_name, default) -> None:
         super().__init__(master, settings)
 
@@ -61,6 +65,7 @@ class SettingsSetterPartEntry(SettingsSetterPart):
         self.entry.pack(side = "right", padx = 3, pady = 3)
 
 class SettingsSetterPartBox(SettingsSetterPart):
+    # Part for getting one string from customtkiter optiobox
     def __init__(self, master, settings: Settings, text: str, settings_name: str, default: str, options: list[str]) -> None:
         super().__init__(master, settings)
 
@@ -72,6 +77,7 @@ class SettingsSetterPartBox(SettingsSetterPart):
         self.box.pack(side = "right", padx = 3, pady = 3)
     
 class SettingsSetter(ctk.CTkToplevel):
+    # Frame for changening values of parts
     def __init__(self, settings: Settings, master) -> None:
         super().__init__()
 
@@ -106,6 +112,7 @@ class SettingsSetter(ctk.CTkToplevel):
         if self.prefix.tk_var == "":
             raise Exception("Empty prefix entry - invalid value")
 
+        # Haven implemented set method on Settings class
         self.settings.data["prefix"] = self.prefix.tk_var.get()
         self.settings.data["index_mode"] = self.index_mode.tk_var.get()
         self.settings.data["smart_index"] = self.smart_index.tk_var.get()

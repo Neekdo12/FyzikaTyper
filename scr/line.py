@@ -24,6 +24,10 @@ class Line(ctk.CTkFrame):
         self.render()
 
     def render(self) -> None:
+        # Renders one line
+        # Firstly is created list of tuples where one tuple corespond to one letter and it's index
+        # Then the list is converted to dictionary with format xy: text where x is the number of normaly sized label, y is the index type, text is the text of the label
+        # If there are more letters in row with the same index there are assigned to one customtkinter label
         self.render_dict: dict[str, str] = {}
         self.dict_pointer: int = -1
         self.dict_helper: str = ""
@@ -31,13 +35,16 @@ class Line(ctk.CTkFrame):
         self.dict_counter: float = 0
         self.letter_tuple: list[tuple[str, str]] = []
 
+        # Creation of the tuple list
         for i in self.letter_list:
             self.letter_tuple.append(i.get_tuple())
 
+        # Chceck for empty line
         if len(self.letter_tuple) == 0:
             self.dict_counter = 0
             return None
         
+        # Creation of the rendering dict
         for num, i in enumerate(self.letter_tuple):
             if num == self.letter_pointer:
                 self.count = False
@@ -67,6 +74,7 @@ class Line(ctk.CTkFrame):
                     self.dict_helper = "u"
                     self.render_dict[f"{self.dict_pointer}u"] = i[0]
         
+        # Rendering loop, the rendering happens after 10 ms to prevent white flickering with customtkinter
         self.dict_pointer: int = 0
         self.dict_helper: str = list(self.render_dict.keys())[0][1]
         for i in self.render_dict:
@@ -74,6 +82,7 @@ class Line(ctk.CTkFrame):
             self.after(10, self.add_label(self.render_dict[i], i))
 
     def add_label(self, text: str, type: str) -> Callable[[], None]:
+        # The main rendering logick that adds labels
         def run() -> None:
             if type[1] == "n":
                 self.labels.append(ctk.CTkLabel(self, text=text, font=self.normal_font))
@@ -90,6 +99,7 @@ class Line(ctk.CTkFrame):
         return run
     
     def rerender(self) -> None:
+        # Delets everything and runs self.render()
         def run() -> None:
             for i in self.labels:
                 i.pack_forget()
@@ -103,6 +113,8 @@ class Line(ctk.CTkFrame):
             run()
     
     def recount(self) -> None:
+        # To know on wich position is cursor curently
+        # Adds lenghts of each letter
         self.dict_counter: float = 0
         self.count: bool = True
 
@@ -121,14 +133,17 @@ class Line(ctk.CTkFrame):
                 self.dict_counter += self.small_letter_site if self.count else 0
     
     def delete(self) -> None:
+        # Delets letter
         self.letter_list.pop(self.letter_pointer - 1)
         self.letter_pointer -= 1
     
     def add_key(self, key: str, type: str) -> None:
+        # Add letter
         self.letter_list.insert(self.letter_pointer, Letter(key, orient=type))
         self.letter_pointer += 1
 
 class Letter():
+    # I do not know why this is not a simple tuple but it is how it is
     def __init__(self, letter: str, orient: str | None = None) -> None:
         self.letter: str = letter
         self.orient: str = orient if orient is not None else "n"

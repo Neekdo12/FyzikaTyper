@@ -12,6 +12,7 @@ class Window(ctk.CTkFrame):
         self.line: int = 0
         self.style_lines: list[ctk.CTkFrame] = []
 
+        # Creates windows layout on load
         if content is None:
             self.lines = [Line(self, text="")]
             for i, v in enumerate(self.lines):
@@ -29,6 +30,7 @@ class Window(ctk.CTkFrame):
     
     
     def rerender(self, height_change: int = 0) -> None:
+        # Places lines on screen after it delets them
         for i, v in enumerate(self.lines):
             v.place_forget()
             v.place(x = 0, rely = 0.1 * i, relwidth = 1, relheight = 0.1)
@@ -41,34 +43,21 @@ class Window(ctk.CTkFrame):
         self.on_direction_click_height(height_change)()
     
     def place_lines(self) -> None:
+        # Only places lines on screen
         for i in range(1, 10):
             self.style_lines.append(ctk.CTkFrame(self, height=2))
             self.style_lines[-1].place(x = 0, rely = 0.1 * i, relwidth = 1)
-    
-    def load(self) -> None:
-        list(map(lambda line: line.place_forget(), self.lines))
-        self.lines_tuple: list[list[tuple[str, str]]] = []
-        self.line: int = 0
-
-        with open("save.json", "r") as file:
-            self.lines_tuple = json.load(file)["lines"]
-        
-        self.lines = []
-        
-        for i in self.lines_tuple:
-            self.lines.append(Line(self, i))
-        
-        self.cursor.lift()
-        self.rerender()
 
     def save(self) -> list[list[tuple[str, str]]]:
-        self.lines_tuple = []
+        # Returns data for rebuilding window object
+        self.lines_tuple: list[list[tuple[str, str]]] = []
         for i in self.lines:
             self.lines_tuple.append(i.letter_tuple)
         
         return self.lines_tuple
     
     def new_line(self) -> None:
+        # Creates new line
         self.lines[self.line].letter_pointer = 0
         self.lines.insert(self.line + 1, Line(self, ""))
         self.cursor.lift()
@@ -79,6 +68,7 @@ class Window(ctk.CTkFrame):
         self.lines[line].rerender()
     
     def type_key(self, key: str, type: str) -> Callable[[], None]:
+        # Added new letter to place where is cursore
         def run() -> None:
             if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
                 self.lines[self.line].delete()
@@ -93,24 +83,29 @@ class Window(ctk.CTkFrame):
         return run
     
     def delete_char(self) -> None:
+        # Delets letter
         self.lines[self.line].delete()
         self.rerender_line(self.line)
         self.on_direction_click_side(0)()
     
     def on_direction_click_side(self, val: int) -> Callable[[], None]:
+        # Moves cursor horizobtaly
         def run() -> None:
             self.lines[self.line].letter_pointer += val
 
+            # To wrap cursor on next line when you overflow the line on ringht
             if self.lines[self.line].letter_pointer > len(self.lines[self.line].letter_list):
                 self.lines[self.line].letter_pointer = 0
                 self.on_direction_click_height(1)()
                 return None
             
+            # To wrap cursor on previous line when you overflow the line on left
             if self.lines[self.line].letter_pointer == -1:
                 self.lines[self.line].letter_pointer = len(self.lines[self.line - 1].letter_list)
                 self.on_direction_click_height(-1)()
                 return None
-
+            
+            # Rendres cursor
             self.lines[self.line].recount()
             self.cursor.place_forget()
             self.cursor.place(x = self.lines[self.line].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
@@ -118,10 +113,13 @@ class Window(ctk.CTkFrame):
         return run
     
     def on_direction_click_height(self, val: int) -> Callable[[], None]:
+        # Moves cursor verticaly
         def run() -> None:
+            # Moves cursor to the start of the file when overflow hapens
             if self.line + 1 >= len(self.lines) and val > 0:
                 self.line = 0
 
+            # Moves cursor to the last line when overfllow hapens
             elif self.line - 1 == -1 and val < 0:
                 self.line = len(self.lines) - 1
                 self.lines[self.line].letter_pointer = self.lines[0].letter_pointer
@@ -133,6 +131,7 @@ class Window(ctk.CTkFrame):
             else:
                 self.line += val
 
+            # Renders cursor
             self.lines[self.line].letter_pointer = self.lines[self.line - val].letter_pointer
             self.on_direction_click_side(0)()
         

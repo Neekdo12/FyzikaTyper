@@ -9,16 +9,19 @@ class WindowLink(ctk.CTkFrame):
         self.window: Window = window
         self.title: str = title
 
+        # Window name
         self.label: ctk.CTkLabel = ctk.CTkLabel(self, text=title)
         self.label.pack(ipadx = 10, ipady = 1)
     
     def render(self) -> None:
+        # Places window on screen
         self.window.place(x = 0, rely = 0.1, relwidth = 1, relheight = 0.9)
     
     def clear(self) -> None:
         self.window.place_forget()
     
     def remove(self) -> None:
+        # Removes window from window bar and screen
         self.pack_forget()
         self.window.place_forget()
         
@@ -35,17 +38,20 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
         self.place(x = 0, y = 0, relwidth = 1, relheight = 0.1)
     
     def add_window(self, window_link: WindowLink, main = False) -> None:
+        # Adds window into internal list and renders it
         window_link.label.bind("<Button-1>", self.set_window(window_link.title))
         window_link.bind("<Button-1>", self.set_window(window_link.title))
 
         self.windows[window_link.title] = window_link
         window_link.pack(side = "left", fill = "y", expand = True, padx = 2, pady = 1)
 
+        # If window is past as main it will be set as main and renderd on screen
         if main or not self.a_window:
             self.a_window = window_link.title
             window_link.render()
 
     def set_window(self, window: str)-> Callable[..., None]:
+        # Renders window on screen and sets active window
         def run(_) -> None:
             try:
                 self.windows[self.a_window].clear()
@@ -58,6 +64,7 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
         return run
 
     def active_window(self) -> Window:
+        # Returns active window
         return self.windows[self.a_window].window
 
     def remove_window(self, name: str) -> None:
