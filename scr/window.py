@@ -1,3 +1,4 @@
+from typing import Callable
 import customtkinter as ctk
 import json
 
@@ -7,9 +8,9 @@ class Window(ctk.CTkFrame):
     def __init__(self, master, content: list[list[tuple[str ,str]]] | None = None) -> None:
         super().__init__(master=master, fg_color="black")
 
-        self.cursor = ctk.CTkFrame(self, fg_color="white", width=2)
-        self.line = 0
-        self.style_lines = []
+        self.cursor: ctk.CTkFrame = ctk.CTkFrame(self, fg_color="white", width=2)
+        self.line: int = 0
+        self.style_lines: list[ctk.CTkFrame] = []
 
         if content is None:
             self.lines = [Line(self, text="")]
@@ -39,7 +40,7 @@ class Window(ctk.CTkFrame):
 
         self.on_direction_click_height(height_change)()
     
-    def place_lines(self, ):
+    def place_lines(self) -> None:
         for i in range(1, 10):
             self.style_lines.append(ctk.CTkFrame(self, height=2))
             self.style_lines[-1].place(x = 0, rely = 0.1 * i, relwidth = 1)
@@ -47,7 +48,7 @@ class Window(ctk.CTkFrame):
     def load(self) -> None:
         list(map(lambda line: line.place_forget(), self.lines))
         self.lines_tuple: list[list[tuple[str, str]]] = []
-        self.line = 0
+        self.line: int = 0
 
         with open("save.json", "r") as file:
             self.lines_tuple = json.load(file)["lines"]
@@ -77,8 +78,8 @@ class Window(ctk.CTkFrame):
     def rerender_line(self, line: int) -> None:
         self.lines[line].rerender()
     
-    def type_key(self, key, type: str):
-        def run():
+    def type_key(self, key: str, type: str) -> Callable[[], None]:
+        def run() -> None:
             if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
                 self.lines[self.line].delete()
 
@@ -96,8 +97,8 @@ class Window(ctk.CTkFrame):
         self.rerender_line(self.line)
         self.on_direction_click_side(0)()
     
-    def on_direction_click_side(self, val: int):
-        def run():
+    def on_direction_click_side(self, val: int) -> Callable[[], None]:
+        def run() -> None:
             self.lines[self.line].letter_pointer += val
 
             if self.lines[self.line].letter_pointer > len(self.lines[self.line].letter_list):
@@ -110,16 +111,14 @@ class Window(ctk.CTkFrame):
                 self.on_direction_click_height(-1)()
                 return None
 
-            # self.lines[self.line].place_forget()
-            # self.lines[self.line].place(x = 0, rely = 0.1 * self.line, relwidth = 1, relheight = 0.1)
             self.lines[self.line].recount()
             self.cursor.place_forget()
             self.cursor.place(x = self.lines[self.line].dict_counter, rely = 0.1 * self.line, relheight = 0.1)
 
         return run
     
-    def on_direction_click_height(self, val: int):
-        def run():
+    def on_direction_click_height(self, val: int) -> Callable[[], None]:
+        def run() -> None:
             if self.line + 1 >= len(self.lines) and val > 0:
                 self.line = 0
 
