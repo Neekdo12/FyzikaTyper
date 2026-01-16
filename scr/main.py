@@ -10,20 +10,23 @@ from window import Window
 from window_helepr import WindowSwitcher, WindowLink
 import docx_helper
 
+type windows_t = dict[str, list[list[tuple[str, str]]]]
+type window_t = list[list[tuple[str, str]]]
+
 class App(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
 
-        self.settings = Settings()
+        self.settings: Settings = Settings()
 
         self.geometry("700x330")
         self.title("Typer")
         self.config(bg="black")
 
-        self.down_index_smart = False
-        self.down_index = False
-        self.up_index = False
-        self.up_index_smart = False
+        self.down_index_smart: bool = False
+        self.down_index: bool = False
+        self.up_index: bool = False
+        self.up_index_smart: bool = False
 
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
 
@@ -61,9 +64,9 @@ class App(ctk.CTk):
             if i == "n":
                 prefix: str = ""
             elif i == "d":
-                prefix = "ctrl+"
+                prefix: str = "ctrl+"
             else:
-                prefix = "alt+"
+                prefix: str = "alt+"
 
             self.hotkeys.append(keyboard.add_hotkey(prefix + "space", callback=self.type_key(" ", i)))
             self.hotkeys.append(keyboard.add_hotkey(prefix + "1", callback=self.type_key("+", i)))
@@ -101,24 +104,25 @@ class App(ctk.CTk):
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
     
-    def export(self):
+    def export(self) -> None:
         self.save()
         docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
     
-    def export_finall(self):
+    def export_finall(self) -> None:
         self.save()
         docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings, finall=True)
     
-    def docx_import(self):
+    def docx_import(self) -> None:
         self.save()
-        data = docx_helper.docx_import(Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
+        data: windows_t = docx_helper.docx_import(Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
         for window in data:
             self.create_window(window, data[window])
 
-    def on_click_change_window(self, val):
-        def run():
-            ac, len_windows = self.windows_bar_frame.a_window, len(self.windows_bar_frame.windows)
-            a_window = list(self.windows_bar_frame.windows).index(ac)
+    def on_click_change_window(self, val: int) -> Callable[[], None]:
+        def run() -> None:
+            ac: str = self.windows_bar_frame.a_window
+            len_windows: int = len(self.windows_bar_frame.windows)
+            a_window: int = list(self.windows_bar_frame.windows).index(ac)
 
             if a_window + val >= len_windows:
                 a_window = 0
@@ -134,32 +138,32 @@ class App(ctk.CTk):
     def new_window(self) -> None:
         self.clear_hotkeys()
 
-        title = str(ctk.CTkInputDialog(text="New window name:").get_input())
+        title: str = str(ctk.CTkInputDialog(text="New window name:").get_input())
         self.create_window(title=title, content=None)
         
         self.after(10, lambda: self.create_hotkeys())
     
-    def new_line(self):
+    def new_line(self) -> None:
         self.windows_bar_frame.active_window().new_line()
     
-    def delete_char(self):
+    def delete_char(self) -> None:
         self.windows_bar_frame.active_window().delete_char()
     
-    def on_direction_click_side(self, val: int):
-        def run():
+    def on_direction_click_side(self, val: int) -> Callable[[], None]:
+        def run() -> None:
             self.windows_bar_frame.active_window().on_direction_click_side(val)()
         
         return run
 
-    def on_direction_click_height(self, val):
-        def run():
+    def on_direction_click_height(self, val: int) -> Callable[[], None]:
+        def run() -> None:
             self.windows_bar_frame.active_window().on_direction_click_height(val)()
         
         return run
     
-    def type_key(self, key, type2: str):
-        def run():
-            type = type2
+    def type_key(self, key: str, type2: str) -> Callable[[], None]:
+        def run() -> None:
+            type: str = type2
 
             if self.settings("index_mode", "toggle") == "hold":
                 if self.up_index:
@@ -186,13 +190,12 @@ class App(ctk.CTk):
         
         return run
 
-    def create_window(self, title, content):
-        # test_line = [[("N", "n"), ("e", "d")], [("a", "n"), ("2", "u")]] # test for some small text sample
+    def create_window(self, title: str, content: window_t) -> None:
         self.windows_bar_frame.add_window(WindowLink(self.windows_bar_frame, Window(self, content=content), title=title if title != "" else "Not defined"))
     
-    def save(self):
+    def save(self) -> None:
         print("startings to save...")
-        self.save_data = {}
+        self.save_data: windows_t = {}
 
         for i in self.windows_bar_frame.windows:
             print(f"saving: {i}")
@@ -203,7 +206,7 @@ class App(ctk.CTk):
         
         print("saving done")
     
-    def new_save(self):
+    def new_save(self) -> None:
         self.save()
 
         self.settings.data["save"] = self.settings.create_save().removesuffix(".json") + ".json"
@@ -212,21 +215,21 @@ class App(ctk.CTk):
             json.dump(self.save_data, file, indent=4)
         print("Created new savefile")
     
-    def new_file(self):
+    def new_file(self) -> None:
         self.save()
         self.reload()
 
-        title = str(ctk.CTkInputDialog(text="New window name:").get_input())
+        title: str = str(ctk.CTkInputDialog(text="New window name:").get_input())
         self.settings.data["save"] = self.settings.create_save().removesuffix(".json") + ".json"
         with open(self.settings.data["save"], "w") as file:
             json.dump({title: [[]]}, file, indent=4)
         
         self.load()
     
-    def load(self):
+    def load(self) -> None:
         print("started loading...")
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "r") as file:
-            self.save_data = json.load(file)
+            self.save_data: windows_t = json.load(file)
         
         for i in self.save_data:
             print(f"loading: {i}")
@@ -234,12 +237,12 @@ class App(ctk.CTk):
         
         print("loading done")
     
-    def force_load(self):
+    def force_load(self) -> None:
         print("started loading...")
         self.reload()
 
         with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]), True), "r") as file:
-            self.save_data = json.load(file)
+            self.save_data: windows_t = json.load(file)
         
         for i in self.save_data:
             print(f"loading: {i}")
@@ -247,24 +250,24 @@ class App(ctk.CTk):
         
         print("loading done")
     
-    def reload(self):
+    def reload(self) -> None:
         print("Saterted reloading")
         for i in self.windows_bar_frame.windows.copy():
             self.windows_bar_frame.remove_window(i)
         print("Reloading done")
     
-    def change_settings(self):
-        self.setter = SettingsSetter(self.settings, self)
+    def change_settings(self) -> None:
+        self.setter: SettingsSetter = SettingsSetter(self.settings, self)
     
-    def close_window(self):
+    def close_window(self) -> None:
         self.windows_bar_frame.remove_window(self.windows_bar_frame.a_window)
     
-    def set_up_index(self):
+    def set_up_index(self) -> None:
         self.up_index = not self.up_index
         self.down_index_smart = False
         self.up_index_smart = False
     
-    def set_down_index(self):
+    def set_down_index(self) -> None:
         self.down_index = not self.down_index
         self.down_index_smart = False
         self.up_index_smart = False
