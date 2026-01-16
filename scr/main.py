@@ -89,6 +89,8 @@ class App(ctk.CTk):
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+shift+l", callback=self.force_load))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+n", callback=self.new_window))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+e", callback=self.export))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+f", callback=self.export_finall))
+        self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+i", callback=self.docx_import))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+left", callback=self.on_click_change_window(-1)))
 
@@ -103,6 +105,16 @@ class App(ctk.CTk):
         self.save()
         docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
     
+    def export_finall(self):
+        self.save()
+        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings, finall=True)
+    
+    def docx_import(self):
+        self.save()
+        data = docx_helper.docx_import(Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
+        for window in data:
+            self.create_window(window, data[window])
+
     def on_click_change_window(self, val):
         def run():
             ac, len_windows = self.windows_bar_frame.a_window, len(self.windows_bar_frame.windows)

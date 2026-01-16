@@ -81,7 +81,7 @@ class SettingsSetter(ctk.CTkToplevel):
         self.prefix = SettingsSetterPartEntry(self, settings, "Prefix for importing into word", "prefix", "zt")
         self.index_mode = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "index_mode", "toggle", ["toggle", "hold"])
         self.smart_index = SettingsSetterPartBox(self, settings, "What should happen when pressing key for indexing", "smart_index", "off", ["off", "on"])
-        self.export_style = SettingsSetterPartBox(self, settings, "What style should be used for exporting into word document", "export_style", "internal", ["none", "oninternal", "custom"])
+        self.export_style = SettingsSetterPartBox(self, settings, "What style should be used for exporting into word document", "export_style", "internal", ["none", "internal", "custom"])
         self.custom_style = SettingsSetterPartEntry(self, settings, "Name of the custom style", "custom_style", "zt-style")
 
         self.buttons = ctk.CTkFrame(self)
