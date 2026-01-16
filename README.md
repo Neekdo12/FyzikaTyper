@@ -1,41 +1,21 @@
 # Physics Typer for Word
 
-A simple tool for **fast typing of superscripts and subscripts** in Microsoft Word.  
-No ribbon clicking, no breaking focus. Just type and move on.
+Simpel tool for writing indexes into word documents
 
-## What problem it solves
-Word is fine, but writing `x²`, `v₀`, `a₁`, or `H₂O` through the UI is slow and annoying.  
-This tool automates that part.
+## How to use
+First you create new windwo - **ctrl+alr+n** then you write you problems and the export the with into ready word document with - **ctrl+alt+e**
+You can also import from ready word document
 
-## Features
-- superscript typing
-- subscript typing
-- works directly in Microsoft Word
-- useful for physics, math, chemistry, and technical documents
+## How to create ready word document
+To the place where you want to have your paragraph with indexes you add "paragraph mark" wich is prefix-windwo name
+Prefix can ve set in setting - **ctrl+alt+p** (default is zt)
+Widnow name in the cane of the window in wich you write the proble in FyzikaTyper
 
-## Typical use cases
-- Physics: `E = mc²`, `v₀`, `Fₙ`
-- Chemistry: `H₂O`, `CO₂`
-- Mathematics: `aₙ`, `xᵢ`
+## More features
+Smart indexing - automaticly indexes the proble you type based on predictive algorithm
+Custom styles - can automaticly style your problems
+Finall export - delets "paraghraph marks" on export - **ctrl+alr+f** (it cannot be undo)
 
-## How it works
-The program listens for keyboard shortcuts and switches typing mode to superscript or subscript.  
-From Word’s point of view, it’s the same as manual formatting — just much faster.
-
-## Why it exists
-- Word is not LaTeX  
-- clicking through menus kills workflow  
-- writing formulas should be quick
-
-## Project status
-- working
-- simple
-- focused on doing one thing well
-
-## License
-This project is licensed under the **MIT License**.  
-You are free to use, modify, and distribute this software with minimal restrictions.  
-See the `LICENSE` file for full license text.
-
->### Creators
->Created with AI help
+## Known isues
+Cannot delete lines
+Needs to close word document befor exporting / importintg
