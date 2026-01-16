@@ -29,7 +29,7 @@ def export(data, document: Document, settings: Settings, finall: bool = False) -
                     paragraph.style = "upper"
                 
                 elif settings("export_style", "internal") == "custom":
-                    paragraph.style = settings("custom_sytel", "upper")
+                    paragraph.style = str(settings("custom_sytel", "upper"))
                 
                 for index, line in enumerate(data[window]):
                     for letter in line:
@@ -44,7 +44,7 @@ def export(data, document: Document, settings: Settings, finall: bool = False) -
                     if index != len(data[window]) - 1:
                         paragraph.add_run("\n")
     
-    document.save(settings("docx", settings.chose_file(settings.file_types["docx"])))
+    document.save(str(settings("docx", settings.chose_file(settings.file_types["docx"]))))
     print("Export done")
 
 def docx_import(document: Document, settings) -> dict[str, list[list[tuple[str, str]]]]:

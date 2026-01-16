@@ -106,15 +106,15 @@ class App(ctk.CTk):
     
     def export(self) -> None:
         self.save()
-        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
+        docx_helper.export(self.save_data, Document(str(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"])))), self.settings)
     
     def export_finall(self) -> None:
         self.save()
-        docx_helper.export(self.save_data, Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings, finall=True)
+        docx_helper.export(self.save_data, Document(str(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"])))), self.settings, finall=True)
     
     def docx_import(self) -> None:
         self.save()
-        data: windows_t = docx_helper.docx_import(Document(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"]))), self.settings)
+        data: windows_t = docx_helper.docx_import(Document(str(self.settings("docx", self.settings.chose_file(self.settings.file_types["docx"])))), self.settings)
         for window in data:
             self.create_window(window, data[window])
 
@@ -201,7 +201,7 @@ class App(ctk.CTk):
             print(f"saving: {i}")
             self.save_data[self.windows_bar_frame.windows[i].title] = self.windows_bar_frame.windows[i].window.save()
         
-        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "w") as file:
+        with open(str(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]))), "w") as file:
             json.dump(self.save_data, file)
         
         print("saving done")
@@ -228,7 +228,7 @@ class App(ctk.CTk):
     
     def load(self) -> None:
         print("started loading...")
-        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"])), "r") as file:
+        with open(str(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]))), "r") as file:
             self.save_data: windows_t = json.load(file)
         
         for i in self.save_data:
@@ -241,7 +241,7 @@ class App(ctk.CTk):
         print("started loading...")
         self.reload()
 
-        with open(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]), True), "r") as file:
+        with open(str(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]), True)), "r") as file:
             self.save_data: windows_t = json.load(file)
         
         for i in self.save_data:

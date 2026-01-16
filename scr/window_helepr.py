@@ -1,3 +1,4 @@
+from typing import Callable
 import customtkinter as ctk
 
 from window import Window
@@ -6,9 +7,9 @@ class WindowLink(ctk.CTkFrame):
     def __init__(self, master, window: Window, title: str = "Undefined title") -> None:
         super().__init__(master=master, fg_color="#161414")
         self.window: Window = window
-        self.title = title
+        self.title: str = title
 
-        self.label = ctk.CTkLabel(self, text=title)
+        self.label: ctk.CTkLabel = ctk.CTkLabel(self, text=title)
         self.label.pack(ipadx = 10, ipady = 1)
     
     def render(self) -> None:
@@ -17,7 +18,7 @@ class WindowLink(ctk.CTkFrame):
     def clear(self) -> None:
         self.window.place_forget()
     
-    def remove(self):
+    def remove(self) -> None:
         self.pack_forget()
         self.window.place_forget()
         
@@ -44,8 +45,8 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
             self.a_window = window_link.title
             window_link.render()
 
-    def set_window(self, window: str):
-        def run(event):
+    def set_window(self, window: str)-> Callable[..., None]:
+        def run(_) -> None:
             try:
                 self.windows[self.a_window].clear()
             except KeyError:
@@ -59,5 +60,5 @@ class WindowSwitcher(ctk.CTkScrollableFrame):
     def active_window(self) -> Window:
         return self.windows[self.a_window].window
 
-    def remove_window(self, name: str):
+    def remove_window(self, name: str) -> None:
         self.windows.pop(name).remove()
