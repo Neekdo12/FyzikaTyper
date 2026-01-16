@@ -2,8 +2,10 @@ from docx.document import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt
 from docx.styles.style import BaseStyle
+from docx.styles.styles import Styles
+from settings import Settings
 
-def export(data, document: Document, settings, finall = False):
+def export(data, document: Document, settings: Settings, finall: bool = False):
     print("Started exporintg")
 
     for paragraph in document.paragraphs:
@@ -16,13 +18,13 @@ def export(data, document: Document, settings, finall = False):
                 paragraph.text = f"{settings("prefix", "zt")}-{window}\n" if not finall else ""
 
                 if settings("export_style", "internal") == "internal":
-                    styles = document.styles
+                    styles: Styles = document.styles
                     if "upper" not in styles:
                         upper: BaseStyle = styles.add_style("upper", WD_STYLE_TYPE.PARAGRAPH)
                         upper.quick_style = True
-                        upper.base_style = styles['Normal']
-                        upper.font.italic = True
-                        upper.font.size = Pt(11)
+                        upper.base_style = styles['Normal'] #type:ignore
+                        upper.font.italic = True #type:ignore
+                        upper.font.size = Pt(11) #type:ignore
 
                     paragraph.style = "upper"
                 
@@ -51,21 +53,21 @@ def docx_import(document: Document, settings) -> dict[str, list[list[tuple[str, 
 
     for paragraph in document.paragraphs:
         if paragraph.text.split("\n")[0].split("-")[0] == settings("prefix", "zt"):
-            window = paragraph.text.split("\n")[0].split("-")[1]
+            window: str = paragraph.text.split("\n")[0].split("-")[1]
             data[window] = []
             print(f"Importing window: {window}")
             
-            start_index = 0
-            run = True
-            while run:
+            start_index: int = 0
+            runs: bool = True
+            while runs:
                 for i in paragraph.runs[start_index].text:
                     if i == "\n":
-                        run = False
+                        runs = False
                         break
                 else:
                     start_index += 1
             
-            had_line = False
+            had_line: bool = False
             for run in paragraph.runs[start_index:]:
                 for letter in run.text:
                     if letter == "\n":
