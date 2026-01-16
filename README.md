@@ -3,8 +3,8 @@
 Simpel tool for writing indexes into word documents
 
 ## How to use
-First you create new windwo - **ctrl+alr+n** then you write you problems and the export the with into ready word document with - **ctrl+alt+e**
-You can also import from ready word document
+- First you create new windwo - **ctrl+alr+n** then you write you problems and the export the with into ready word document with - **ctrl+alt+e**
+- You can also import from ready word document
 
 ## How to create ready word document
 - To the place where you want to have your paragraph with indexes you add "paragraph mark" wich is prefix-windwo name
