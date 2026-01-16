@@ -118,17 +118,16 @@ class App(ctk.CTk):
     def on_click_change_window(self, val):
         def run():
             ac, len_windows = self.windows_bar_frame.a_window, len(self.windows_bar_frame.windows)
+            a_window = list(self.windows_bar_frame.windows).index(ac)
 
-            """
-            if ac + val >= len_windows:
-                ac = 0
-            elif ac + val == -1:
-                ac = len_windows - 1
+            if a_window + val >= len_windows:
+                a_window = 0
+            elif a_window + val == -1:
+                a_window = len_windows - 1
             else:
-                ac += val
-            """
+                a_window += val
             
-            self.windows_bar_frame.set_window(ac)(None)
+            self.windows_bar_frame.set_window(list(self.windows_bar_frame.windows)[a_window])(None)
 
         return run
     
