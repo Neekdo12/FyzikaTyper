@@ -10,7 +10,7 @@ from settings import Settings, SettingsSetter
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
 import docx_helper
-from ex_bar import exBar
+from ex_bar import exFrame
 
 type windows_t = dict[str, list[list[tuple[str, str]]]]
 type window_t = list[list[tuple[str, str]]]
@@ -31,7 +31,7 @@ class App(ctk.CTk):
         self.up_index_smart: bool = False
 
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
-        self.exbar: exBar = exBar(self)
+        # self.exbar: exBar = exBar(self)
 
         # To load window data
         self.load()
@@ -113,12 +113,13 @@ class App(ctk.CTk):
     
     def show(self) -> None:
         self.clear_hotkeys()
-        self.exbar.show("s", self.un_show)
+        self.exbar = exFrame(self, self.un_show)
     
     def un_show(self) -> None:
-        # self.new_line()
+        print(self.exbar.ret)
+        self.exbar.place_forget()
         for letter in self.exbar.ret:
-            self.type_key(letter[0], letter[1])()
+            self.type_key(letter[0], letter[1], ignore_keyboard = True)()
         self.after(60, self.windows_bar_frame.active_window().rerender_line, self.windows_bar_frame.active_window().line)
         # self.after(30, self.on_direction_click_height(-1))
 
@@ -191,7 +192,7 @@ class App(ctk.CTk):
         
         return run
     
-    def type_key(self, key: str, type2: str) -> Callable[[], None]:
+    def type_key(self, key: str, type2: str, ignore_keyboard: bool = False) -> Callable[[], None]:
         def run() -> None:
             type: str = type2
 
@@ -220,7 +221,7 @@ class App(ctk.CTk):
                 self.down_index_smart = False
                 type = "n"
             
-            self.windows_bar_frame.active_window().type_key(key, type)()
+            self.windows_bar_frame.active_window().type_key(key, type, ignor_keyboard=ignore_keyboard)()
             print(key, type)
         
         return run
