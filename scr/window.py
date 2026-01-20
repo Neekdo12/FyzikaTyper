@@ -67,14 +67,15 @@ class Window(ctk.CTkFrame):
     def rerender_line(self, line: int) -> None:
         self.lines[line].rerender()
     
-    def type_key(self, key: str, type: str) -> Callable[[], None]:
+    def type_key(self, key: str, type: str, ignor_keyboard: bool = False) -> Callable[[], None]:
         # Added new letter to place where is cursore
         def run() -> None:
-            if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
-                self.lines[self.line].delete()
+            if not ignor_keyboard:
+                if key == "3" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "a":
+                    self.lines[self.line].delete()
 
-            if key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "Y":
-                self.lines[self.line].delete()
+                if key == "5" and self.lines[self.line].letter_list[self.lines[self.line].letter_pointer - 1].get_tuple()[0] == "Y":
+                    self.lines[self.line].delete()
 
             self.lines[self.line].add_key(key, type)
             self.rerender_line(self.line)
