@@ -1,5 +1,8 @@
 {
     "save": "C:/Users/jakub/OneDrive - SP\u0160SE a VO\u0160, Liberec/Programov\u00e1n\u00ed/Fyzyka_typer/saves/save.json",
     "index_mode": "toggle",
-    "smart_index": "off"
+    "smart_index": "off",
+    "prefix": "zt",
+    "export_style": "internal",
+    "custom_style": "zt-style"
 }
