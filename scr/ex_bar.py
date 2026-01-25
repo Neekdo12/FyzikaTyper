@@ -112,12 +112,12 @@ class exFrame(ctk.CTkFrame):
         super().__init__(master, border_color="white", border_width=3)
         self.place(relx = 0.5, rely = 0.5, relwidth=0.5, relheight=0.5, anchor = "center")
         self.data = data
-        self.last_render = exRender(self, self.data, self.next, self.back, self.set)
+        self.last_render = exRender(self, self.data, self.next, self.back, self.set, self.end)
         self.un_show = un_show
 
     def next(self):
         self.ret = self.last_render.ret
-        self.last_render = exRender(self, self.ret, self.next, self.back, self.set)
+        self.last_render = exRender(self, self.ret, self.next, self.back, self.set, self.end)
     
     def back(self):
         self.ret = self.last_render.ret
@@ -126,6 +126,10 @@ class exFrame(ctk.CTkFrame):
     def set(self):
         self.ret = self.last_render.ret
         self.last_render = exSetter(self, self.back, self.ret)
+
+    def end(self):
+        self.ret = []
+        self.un_show()
 
 class exSetter(ctk.CTkFrame):
     def __init__(self, master, back, data):
@@ -233,7 +237,7 @@ class exSetter(ctk.CTkFrame):
         self.back()
 
 class exRender(ctk.CTkFrame):
-    def __init__(self, master, dato, next_func, back_func, set_func):
+    def __init__(self, master, dato, next_func, back_func, set_func, end):
         super().__init__(master)
 
         self.data = dato
@@ -248,11 +252,13 @@ class exRender(ctk.CTkFrame):
         self.next_func = next_func
         self.back_func = back_func
         self.set_func = set_func
+        self.end_func = end
 
         self.hotkeys.append(keyboard.add_hotkey("down", self.move_up))
         self.hotkeys.append(keyboard.add_hotkey("up", self.move_down))
         self.hotkeys.append(keyboard.add_hotkey("tab", self.ret_t))
         self.hotkeys.append(keyboard.add_hotkey("enter", self.ret_e))
+        self.hotkeys.append(keyboard.add_hotkey("esc", self.end))
 
         self.normal_font: ctk.CTkFont = ctk.CTkFont(family="Consolas", size=30)
         self.small_font: ctk.CTkFont = ctk.CTkFont(family="Consolas", size=17)
@@ -331,6 +337,12 @@ class exRender(ctk.CTkFrame):
             self.next_func()
         else:
             self.back_func()
+    
+    def end(self):
+        for i in self.hotkeys:
+            keyboard.remove_hotkey(i)
+
+        self.end_func()
     
     def scroll(self):
         if self.pointer >= 5 or self.pointer == 0:
