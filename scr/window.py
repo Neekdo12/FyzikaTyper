@@ -85,8 +85,15 @@ class Window(ctk.CTkFrame):
     
     def delete_char(self) -> None:
         # Delets letter
-        self.lines[self.line].delete()
-        self.rerender_line(self.line)
+        try:
+            self.lines[self.line].delete()
+            self.rerender_line(self.line)
+        except IndexError:
+            self.lines.pop(self.line)
+            self.line -= 1
+            self.lines[self.line].letter_pointer = len(self.lines[self.line].letter_list) - 1
+            self.rerender()
+
         self.on_direction_click_side(0)()
     
     def on_direction_click_side(self, val: int) -> Callable[[], None]:

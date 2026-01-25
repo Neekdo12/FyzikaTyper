@@ -6,7 +6,7 @@ data = {
         (("v", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("t", "n")): {
             (("v", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("t", "n")): (("v", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("t", "n")),
             (("s", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("v", "n"), (" ", "n"), ("*", "n"), (" ", "n"), ("t", "n")): (("s", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("v", "n"), (" ", "n"), ("*", "n"), (" ", "n"), ("t", "n")),
-            (("t", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("v", "n")): (("v", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("t", "n")),
+            (("t", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("v", "n")): (("t", "n"), (" ", "n"), ("=", "n"), (" ", "n"), ("s", "n"), (" ", "n"), ("/", "n"), (" ", "n"), ("v", "n")),
         },
         (("a", "n"), ("=", "n"), ("a", "n")): {
             (("1", "n"), ("=", "n"), ("v", "n")): (("1", "n"), ("=", "n"), ("v", "n")),
@@ -112,6 +112,7 @@ class exRender(ctk.CTkFrame):
             frame.place(x = 0, y = 0 + 30 * num, relwidth=1, relheight=0.2)
         
         self.place(x = 3, y = 3, relwidth=0.98, relheight=0.96)
+        self.activate()
 
     def move_up(self):
         self.pointer += 1
@@ -126,13 +127,12 @@ class exRender(ctk.CTkFrame):
 
         if self.pointer == -1:
             self.pointer = len(list(self.data)) - 1
-            # print(self.data)
         
         self.activate()
     
     def activate(self):
-        self.labels[self.pointer].pack(side="right")
         self.labels[self.temp_pointer].pack_forget()
+        self.labels[self.pointer].pack(side="right")
 
         self.temp_pointer = self.pointer
     
@@ -142,7 +142,10 @@ class exRender(ctk.CTkFrame):
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
         
-        self.next_func() if not isinstance(self.ret, tuple) else self.back_func()
+        if not isinstance(self.ret, tuple):
+            self.next_func()
+        else:
+            self.back_func()
     
     def ret_e(self):
         self.ret = self.data[list(self.data)[self.pointer]]
@@ -150,4 +153,15 @@ class exRender(ctk.CTkFrame):
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
 
-        self.next_func() if not isinstance(self.ret, tuple) else self.back_func()
+        try:
+            if isinstance(self.ret[list(self.ret)[0]], tuple):
+                self.ret = list(self.ret)[0]
+                self.back_func()
+                return None
+        except TypeError:
+            ...
+
+        if not isinstance(self.ret, tuple):
+            self.next_func()
+        else:
+            self.back_func()

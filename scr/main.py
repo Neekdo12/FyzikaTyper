@@ -239,7 +239,7 @@ class App(ctk.CTk):
             self.save_data[self.windows_bar_frame.windows[i].title] = self.windows_bar_frame.windows[i].window.save()
         
         with open(str(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]))), "w") as file:
-            json.dump(self.save_data, file)
+            json.dump(self.save_data, file, indent=4)
         
         print("saving done")
     
