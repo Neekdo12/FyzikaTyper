@@ -1,3 +1,4 @@
+from logging.config import valid_ident
 from typing import Callable, Optional
 import customtkinter as ctk
 import keyboard
@@ -9,6 +10,7 @@ from settings import Settings, SettingsSetter
 from window import Window
 from window_helepr import WindowSwitcher, WindowLink
 import docx_helper
+from ex_bar import exFrame
 
 type windows_t = dict[str, list[list[tuple[str, str]]]]
 type window_t = list[list[tuple[str, str]]]
@@ -29,6 +31,7 @@ class App(ctk.CTk):
         self.up_index_smart: bool = False
 
         self.windows_bar_frame: WindowSwitcher = WindowSwitcher(self)
+        # self.exbar: exBar = exBar(self)
 
         # To load window data
         self.load()
@@ -38,7 +41,7 @@ class App(ctk.CTk):
         self.windows_bar_frame.set_window(list(self.windows_bar_frame.windows)[0])("")
         self.mainloop()
     
-    def create_hotkeys(self) -> None:
+    def create_hotkeys(self, from_ex = False) -> None:
         # To create hotkeys many times
         self.hotkeys: list[Callable] = []
 
@@ -99,12 +102,28 @@ class App(ctk.CTk):
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+right", callback=self.on_click_change_window(1)))
         self.hotkeys.append(keyboard.add_hotkey("ctrl+alt+left", callback=self.on_click_change_window(-1)))
 
+        self.hotkeys.append(keyboard.add_hotkey("tab", callback=self.show))
+
         self.hotkeys.append(keyboard.add_hotkey("ctrl", callback=self.set_down_index))
         self.hotkeys.append(keyboard.add_hotkey("alt", callback=self.set_up_index))
-    
+
     def clear_hotkeys(self) -> None:
         for i in self.hotkeys:
             keyboard.remove_hotkey(i)
+    
+    def show(self) -> None:
+        self.clear_hotkeys()
+        self.exbar = exFrame(self, self.un_show)
+    
+    def un_show(self) -> None:
+        print(self.exbar.ret)
+        self.exbar.place_forget()
+        for letter in self.exbar.ret:
+            self.type_key(letter[0], letter[1], ignore_keyboard = True)()
+        self.after(60, self.windows_bar_frame.active_window().rerender_line, self.windows_bar_frame.active_window().line)
+        # self.after(30, self.on_direction_click_height(-1))
+
+        self.create_hotkeys()
     
     def export(self) -> None:
         # Exports to word document - leavs export marks
@@ -173,7 +192,7 @@ class App(ctk.CTk):
         
         return run
     
-    def type_key(self, key: str, type2: str) -> Callable[[], None]:
+    def type_key(self, key: str, type2: str, ignore_keyboard: bool = False) -> Callable[[], None]:
         def run() -> None:
             type: str = type2
 
@@ -202,7 +221,8 @@ class App(ctk.CTk):
                 self.down_index_smart = False
                 type = "n"
             
-            self.windows_bar_frame.active_window().type_key(key, type)()
+            self.windows_bar_frame.active_window().type_key(key, type, ignor_keyboard=ignore_keyboard)()
+            print(key, type)
         
         return run
 
@@ -219,7 +239,7 @@ class App(ctk.CTk):
             self.save_data[self.windows_bar_frame.windows[i].title] = self.windows_bar_frame.windows[i].window.save()
         
         with open(str(self.settings("save", self.settings.chose_file(self.settings.file_types["json"]))), "w") as file:
-            json.dump(self.save_data, file)
+            json.dump(self.save_data, file, indent=4)
         
         print("saving done")
     
