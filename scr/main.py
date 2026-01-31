@@ -116,7 +116,6 @@ class App(ctk.CTk):
         self.exbar = exFrame(self, self.un_show)
     
     def un_show(self) -> None:
-        print(self.exbar.ret)
         self.exbar.place_forget()
         for letter in self.exbar.ret:
             self.type_key(letter[0], letter[1], ignore_keyboard = True)()
@@ -222,7 +221,6 @@ class App(ctk.CTk):
                 type = "n"
             
             self.windows_bar_frame.active_window().type_key(key, type, ignor_keyboard=ignore_keyboard)()
-            print(key, type)
         
         return run
 

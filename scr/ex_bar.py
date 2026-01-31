@@ -1,6 +1,8 @@
-from ctypes import pointer
+from typing import Optional
 import customtkinter as ctk
 import keyboard
+
+from string import ascii_letters, digits
 
 data = {
     "Kinematika": {
@@ -134,10 +136,13 @@ class exSetter(ctk.CTkFrame):
 
         self.ret = data
         self.data = data
+        self.ret_data: list = list(data)
         self.back = back
-        self.names = {}
+        self.names: dict[tuple[str, str], ctk.StringVar] = {}
+        self.names_str: dict[tuple[str, str], str] = {}
         self.last = "n"
         self.name = ""
+        self.indexies = ""
 
         self.normal_font: ctk.CTkFont = ctk.CTkFont(family="Consolas", size=30)
         self.small_font: ctk.CTkFont = ctk.CTkFont(family="Consolas", size=17)
@@ -153,27 +158,52 @@ class exSetter(ctk.CTkFrame):
 
         self.frame.grid(column=0, row=0, columnspan=2,pady = 3)
 
+        # Sets helpper and temp vars
+        last_index: int
+        first_index = True
+
         for letter, index in self.data:
-            if index == "d":
-                if self.last == "d":
-                    self.name += letter
-                else:
-                    self.last = "d"
-                    self.name = letter
+
+            # Checks if letter is letter or digit
+            if (letter in ascii_letters or letter in digits) and index != "u":
+                if first_index and (letter in digits): # If main letter is digit it skips this interaction so only digit indexies are counted
+                    continue
+                
+                # Addes letters to temp vars
+                self.name += letter
+                self.indexies += index
+                self.last = "d"
+                
+                # Removes letter
+                last_index = self.ret_data.index((letter, index))
+                self.ret_data.pop(last_index)
+
+                first_index = False
             
-            elif index == "n" and self.last == "d":
-                self.names[self.name] = None
+            else:
+                if self.last == "d":
+
+                    # Places place holder insted of removed letters
+                    self.names_str[(self.name, self.indexies)] = ""
+                    self.ret_data.insert(last_index, self.name)
                 self.last = "n"
+
+                # Cleasn temp vars
+                self.name = ""
+                self.indexies = ""
+                first_index = True
         
+        # If end with unplaced place holder it is finnished corectly
         if self.last == "d":
-            self.names[self.name] = None
+            self.names_str[(self.name, self.indexies)] = ""
+            self.ret_data.insert(last_index, self.name)
         
-        for row, name in enumerate(self.names):
+        for row, name in enumerate(self.names_str):
             frame = ctk.CTkFrame(self, fg_color="transparent")
             self.frames.append(frame)
 
             var = ctk.StringVar(self, "")
-            ctk.CTkLabel(frame, text=f"{name}:", font=self.normal_font).pack(side = "left", padx = 3)
+            ctk.CTkLabel(frame, text=f"{name[0]}:", font=self.normal_font).pack(side = "left", padx = 3)
             entry = ctk.CTkEntry(frame, textvariable=var)
             entry.pack(side = "right", padx=3)
 
@@ -191,42 +221,29 @@ class exSetter(ctk.CTkFrame):
     def end(self):
         keyboard.remove_hotkey(self.short_cut)
 
-        for i in self.names:
-            if self.names[i].get() == "":
-                self.names[i].set(i)
-            
-            self.names[i] = self.names[i].get()
-            ret = []
-
-            for index in self.names[i]:
-                ret.append((index, "d"))
-            
-            self.names[i] = ret
-        
         self.ret = []
-        self.name = ""
-        self.last = "n"
+
+        # Validates user input
+        # Fills in blank spaces to preset indexies
+        for key in self.names:
+            self.names_str[key] = self.names[key].get() if self.names[key].get() != "" else key[0][1:]
+
+        #Replaces place holders in ret_data
+        for name in self.names_str:
+
+            # If there are multiple place holders replaces all
+            while name[0] in self.ret_data:
+                index: int = self.ret_data.index(name[0]) # Gets index of place holder
+                self.ret_data.pop(index) # Removes palce holder
+
+                # Inserts letters into ret_data in revers order because it pushes already insterted letters to right
+                for letter in self.names_str[name][::-1]:
+                    self.ret_data.insert(index, (letter, "d"))
+                
+                # Inserts main latter last beacues it is the most left one
+                self.ret_data.insert(index, (name[0][0], "n"))
         
-        for letter, index in self.data:
-            if index != "d":
-                if self.last == "d":
-                    for i in self.names[self.name]:
-                        self.ret.append(i)
-
-                self.ret.append((letter, index))
-                self.last = "n"
-            
-            else:
-                if self.last == "d":
-                    self.name += letter
-                else:
-                    self.name = letter
-                    print(letter, self.name)
-
-                self.last = "d"
-        if self.last == "d":
-            for i in self.names[self.name]:
-                self.ret.append(i)
+        self.ret = self.ret_data.copy()
         
         self.back()
 
